@@ -140,7 +140,7 @@ public class AAFun implements HtmlParser, Serializable {
 // 解析评分
     Elements ratingElements = document.select(".hl-score-nums span");
     if (!ratingElements.isEmpty()) {
-      Double rating = Double.parseDouble(ratingElements.get(0).text());
+      String rating = ratingElements.get(0).text();
       animation.setRating(rating);
     }
     return new AnimationDetail(animation, sources);

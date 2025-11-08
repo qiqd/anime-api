@@ -63,7 +63,11 @@ public class Animation implements Serializable {
   /**
    * 评分
    */
-  private Double rating;
+  private String rating;
+  /**
+   * 评分人数
+   */
+  private String ratingCount;
 
   /**
    * 动画状态（如连载中、已完结等）
