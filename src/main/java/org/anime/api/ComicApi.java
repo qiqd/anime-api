@@ -15,7 +15,7 @@ import java.util.HashMap;
 public class ComicApi implements Serializable {
   private static final Logger log = LoggerFactory.getLogger(ComicApi.class);
 
-  public static final ArrayList<SourceWithDelay> SOURCES_WITH_DELAY = new ArrayList<>();
+  public static final ArrayList<SourceWithDelay<AbstractComicParser>> SOURCES_WITH_DELAY = new ArrayList<>();
   public static final HashMap<String, AbstractComicParser> SOURCE_MAP = new HashMap<>();
 
   static {
@@ -26,11 +26,11 @@ public class ComicApi implements Serializable {
     if (index < 0 || index >= SOURCES_WITH_DELAY.size()) {
       return;
     }
-    SourceWithDelay sourceWithDelay = SOURCES_WITH_DELAY.remove(index);
+    SourceWithDelay<AbstractComicParser> sourceWithDelay = SOURCES_WITH_DELAY.remove(index);
     SOURCES_WITH_DELAY.add(0, sourceWithDelay);
   }
 
   public static void initialization() {
-    HttpUtil.delayTest(SOURCES_WITH_DELAY, SOURCE_MAP);
+    HttpUtil.delayTestSync(SOURCES_WITH_DELAY, SOURCE_MAP);
   }
 }

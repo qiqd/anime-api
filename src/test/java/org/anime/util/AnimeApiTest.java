@@ -4,12 +4,12 @@ import org.anime.api.AnimationApi;
 import org.anime.parser.AbstractAnimationParser;
 import org.junit.Test;
 
-import java.util.HashMap;
+import java.util.Map;
 
 public class AnimeApiTest {
   @Test
   public void testDecryptVideoUrl() throws Exception {
-    HashMap<String, AbstractAnimationParser> htmlParserMap = AnimationApi.SOURCE_MAP;
+    Map<String, AbstractAnimationParser> htmlParserMap = AnimationApi.SOURCE_MAP;
     for (String s : htmlParserMap.keySet()) {
       long start = System.currentTimeMillis();
       System.out.println(s);

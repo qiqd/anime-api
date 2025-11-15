@@ -10,12 +10,14 @@ import org.anime.util.HttpUtil;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class AnimationApi implements Serializable {
   private static final Logger log = LoggerFactory.getLogger(AnimationApi.class);
 
-  public static final ArrayList<SourceWithDelay> SOURCES_WITH_DELAY = new ArrayList<>();
-  public static final HashMap<String, AbstractAnimationParser> SOURCE_MAP = new HashMap<>();
+  public static final List<SourceWithDelay<AbstractAnimationParser>> SOURCES_WITH_DELAY = new ArrayList<>();
+  public static final Map<String, AbstractAnimationParser> SOURCE_MAP = new HashMap<>();
 
   static {
     SOURCE_MAP.put(AAFun.NAME, new AAFun());
@@ -30,11 +32,11 @@ public class AnimationApi implements Serializable {
     if (index < 0 || index >= SOURCES_WITH_DELAY.size()) {
       return;
     }
-    SourceWithDelay sourceWithDelay = SOURCES_WITH_DELAY.remove(index);
+    SourceWithDelay<AbstractAnimationParser> sourceWithDelay = SOURCES_WITH_DELAY.remove(index);
     SOURCES_WITH_DELAY.add(0, sourceWithDelay);
   }
 
   public static void initialization() {
-    HttpUtil.delayTest(SOURCES_WITH_DELAY, SOURCE_MAP);
+    HttpUtil.delayTestSync(SOURCES_WITH_DELAY, SOURCE_MAP);
   }
 }
