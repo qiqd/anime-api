@@ -51,10 +51,6 @@ public class Animation extends Media implements Serializable {
    */
   private Integer totalEpisode;
 
-  /**
-   * 播放平台
-   */
-  private String platform;
 
   /**
    * 国家/地区

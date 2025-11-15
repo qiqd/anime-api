@@ -67,6 +67,15 @@ public class Media implements Serializable {
    * 来源网站URL
    */
   private String sourceUrl;
+  /**
+   * 播放平台
+   */
+  private String platform;
+
+  /**
+   * 发行时间
+   */
+  private String releaseDate;
 
   public String getGenre() {
     return StringUtil.removeUnusedChar(genre);
