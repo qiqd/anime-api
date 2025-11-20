@@ -1,4 +1,4 @@
-package org.anime.entity.bangmi;
+package org.anime.entity.meta;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

@@ -3,6 +3,7 @@ package org.anime.entity.base;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 import org.anime.util.StringUtil;
 
 import java.io.Serializable;
@@ -12,6 +13,7 @@ import java.util.List;
  * 媒体基类
  */
 @Data
+@SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
 public class Media implements Serializable {
@@ -55,6 +57,10 @@ public class Media implements Serializable {
    * 评分
    */
   private String rating;
+  /**
+   * 评分人数
+   */
+  private String ratingCount;
   /**
    * 观看次数
    */

@@ -7,8 +7,8 @@ import org.anime.meta.MetaService;
 public class BangumiTest extends TestCase {
   private final MetaService bangumi = new Bangumi();
 
-  public void testFetchSearchResultSync() throws Exception {
-    System.out.println(JSON.toJSONString(bangumi.fetchSearchResultSync("租借女友", 1, 10)));
+  public void testFetchSubjectSearchSync() throws Exception {
+    System.out.println(JSON.toJSONString(bangumi.fetchSubjectSearchSync("租借女友", 1, 10)));
   }
 
   public void testFetchWeeklyUpdateSync() throws Exception {

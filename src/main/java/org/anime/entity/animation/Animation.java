@@ -1,17 +1,17 @@
 package org.anime.entity.animation;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import lombok.experimental.SuperBuilder;
 import org.anime.entity.base.Media;
 import org.anime.util.StringUtil;
 
 import java.io.Serializable;
 
 @Data
+@SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
+@ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
 public class Animation extends Media implements Serializable {
 

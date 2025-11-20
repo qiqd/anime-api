@@ -1,6 +1,6 @@
 package org.anime.api;
 
-import org.anime.entity.bangmi.SourceWithDelay;
+import org.anime.entity.meta.SourceWithDelay;
 import org.anime.loger.Logger;
 import org.anime.loger.LoggerFactory;
 import org.anime.parser.AbstractAnimationParser;

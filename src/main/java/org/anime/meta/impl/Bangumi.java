@@ -3,9 +3,9 @@ package org.anime.meta.impl;
 import com.alibaba.fastjson.JSON;
 import org.anime.entity.animation.Animation;
 import org.anime.entity.animation.Schedule;
-import org.anime.entity.bangmi.DailySchedule;
-import org.anime.entity.bangmi.EpisodeResult;
-import org.anime.entity.bangmi.SubjectSearch;
+import org.anime.entity.meta.DailySchedule;
+import org.anime.entity.meta.EpisodeResult;
+import org.anime.entity.meta.SubjectSearch;
 import org.anime.meta.MetaService;
 import org.anime.util.HttpUtil;
 import org.jsoup.Connection;
@@ -18,6 +18,21 @@ import java.util.stream.Collectors;
 public class Bangumi implements MetaService, Serializable {
   private static final String baseUrl = "https://api.bgm.tv";
 
+  @Override
+  public String getName() {
+    return "";
+  }
+
+  @Override
+  public String getLogoUrl() {
+    return "";
+  }
+
+  @Override
+  public String getBaseUrl() {
+    return "";
+  }
+
   /**
    * 搜索
    *
@@ -27,7 +42,7 @@ public class Bangumi implements MetaService, Serializable {
    * @return SubjectSearch
    */
   @Override
-  public List<Animation> fetchSearchResultSync(String keyword, Integer page, Integer size) throws IOException {
+  public List<Animation> fetchSubjectSearchSync(String keyword, Integer page, Integer size) throws IOException {
     String searchUrl = "/v0/search/subjects";
     HashMap<String, Object> body = new HashMap<>();
     body.put("keyword", keyword);

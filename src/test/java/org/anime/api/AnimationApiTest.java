@@ -2,7 +2,7 @@ package org.anime.api;
 
 import com.alibaba.fastjson.JSON;
 import org.anime.entity.animation.Animation;
-import org.anime.entity.bangmi.SourceWithDelay;
+import org.anime.entity.meta.SourceWithDelay;
 import org.anime.parser.AbstractAnimationParser;
 import org.junit.Test;
 
