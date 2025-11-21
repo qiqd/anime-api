@@ -164,7 +164,7 @@ public class AAFun extends AbstractAnimationParser {
       String rating = ratingElements.get(0).text();
       animation.setRating(rating);
     }
-    return new Detail<>(animation, sources);
+    return new Detail<>(animation, null, sources);
   }
 
 

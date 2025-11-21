@@ -118,7 +118,7 @@ public class Mwcy extends AbstractAnimationParser {
     animation.setRating(rating);
     animation.setRatingCount(totalRating);
     animation.setDescription(introduction);
-    return new Detail<>(animation, sources);
+    return new Detail<>(animation, null, sources);
   }
 
 

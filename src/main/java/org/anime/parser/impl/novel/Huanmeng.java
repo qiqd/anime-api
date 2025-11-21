@@ -96,7 +96,7 @@ public class Huanmeng extends AbstractNovelParser {
     String description = infoBox.select("div.kan-jianjie").text();
     Novel novel = fillNovel(mediaId, cover, titleCN, status, genre, author, description);
     novel.setLatestChapter(lastChapter);
-    return new Detail<>(novel, Collections.singletonList(new Source(0, "default", episodes)));
+    return new Detail<>(novel, null, Collections.singletonList(new Source(0, "default", episodes)));
   }
 
 

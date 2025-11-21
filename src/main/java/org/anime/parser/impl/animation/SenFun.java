@@ -121,7 +121,7 @@ public class SenFun extends AbstractAnimationParser {
     animation.setAriDate(airDate);
     animation.setDuration(duration);
     animation.setTotalEpisode(Integer.parseInt(totalEpisode));
-    return new Detail<>(animation, sources);
+    return new Detail<>(animation, null, sources);
   }
 
   @Override

@@ -118,7 +118,7 @@ public class MengDao extends AbstractAnimationParser {
     animation.setActor(StringUtil.removeUnusedChar(cast).substring(3));
     animation.setRole(StringUtil.removeUnusedChar(role).substring(3));
     animation.setTitleEn(otherName.substring(3).trim());
-    return new Detail<>(animation, sources);
+    return new Detail<>(animation, null, sources);
   }
 
   @Override

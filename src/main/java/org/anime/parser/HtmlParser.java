@@ -77,4 +77,6 @@ public interface HtmlParser extends Serializable {
    * @throws Exception 解析异常
    */
   List<Schedule> fetchWeeklySync() throws Exception;
+
+  
 }

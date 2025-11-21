@@ -97,7 +97,7 @@ public class Baozi extends AbstractComicParser {
     comic.setGenre(genre);
     comic.setStatus(status);
     comic.setCoverUrls(Collections.singletonList(cover));
-    return new Detail<>(comic, Collections.singletonList(new Source(0, "默认", result1)));
+    return new Detail<>(comic, null, Collections.singletonList(new Source(0, "默认", result1)));
   }
 
   @Override

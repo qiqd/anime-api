@@ -3,7 +3,6 @@ package org.anime.entity.animation;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 import org.anime.entity.base.Media;
-import org.anime.util.StringUtil;
 
 import java.io.Serializable;
 
@@ -74,12 +73,5 @@ public class Animation extends Media implements Serializable {
    * 片长
    */
   private String duration;
-
-  public String getActor() {
-    return StringUtil.removeUnusedChar(actor);
-  }
-
-  public String getDirector() {
-    return StringUtil.removeUnusedChar(director);
-  }
+  
 }

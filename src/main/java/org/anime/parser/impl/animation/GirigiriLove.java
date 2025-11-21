@@ -123,7 +123,7 @@ public class GirigiriLove extends AbstractAnimationParser {
     anime.setGenre(StringUtil.removeUnusedChar(type));
     anime.setStatus(status);
     anime.setDescription(description);
-    return new Detail<>(anime, sources);
+    return new Detail<>(anime, null, sources);
   }
 
   @Override

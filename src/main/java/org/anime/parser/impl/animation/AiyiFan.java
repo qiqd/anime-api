@@ -134,7 +134,7 @@ public class AiyiFan extends AbstractAnimationParser {
     animation.setLanguage(language);
     animation.setAriDate(ariDate);
     animation.setDescription(description);
-    return new Detail<>(animation, sources);
+    return new Detail<>(animation, null, sources);
   }
 
 
