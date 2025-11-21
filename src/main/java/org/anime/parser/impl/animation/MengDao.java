@@ -64,7 +64,7 @@ public class MengDao extends AbstractAnimationParser {
       Elements status = item.select("p.bz");
       String statusText = status.text();
       Animation animation = new Animation();
-      animation.setId(id);
+      animation.setSubId(id);
       animation.setTitleCn(titleCn);
       animation.setStatus(statusText);
       animation.setCoverUrls(Collections.singletonList(cover));
@@ -109,7 +109,7 @@ public class MengDao extends AbstractAnimationParser {
     String otherName = infoItem.size() > 4 ? infoItem.get(4).text() : "";
     String description = Optional.ofNullable(infoBox.select("dt").last()).orElse(new Element("dt")).text();
     Animation animation = new Animation();
-    animation.setId(videoId);
+    animation.setSubId(videoId);
     animation.setTitleCn(titleCn);
     animation.setStatus(status);
     animation.setCoverUrls(Collections.singletonList(cover));

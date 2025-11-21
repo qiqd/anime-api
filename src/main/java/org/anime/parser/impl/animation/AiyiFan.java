@@ -31,7 +31,7 @@ public class AiyiFan extends AbstractAnimationParser {
 
   private Animation fillAnimation(String videoId, String titleCN, String cover, String status, String genre, String actor, String director, String country) {
     Animation animation = new Animation();
-    animation.setId(videoId);
+    animation.setSubId(videoId);
     animation.setTitleCn(titleCN);
     animation.setCoverUrls(Collections.singletonList(cover));
     animation.setStatus(status);

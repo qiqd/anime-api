@@ -59,7 +59,7 @@ public class AAFun extends AbstractAnimationParser {
       Elements a = item.select("div.hl-item-div a");
       String status = item.select("span.hl-lc-1.remarks").text();
       Animation animation = new Animation();
-      animation.setId(a.attr("href"));
+      animation.setSubId(a.attr("href"));
       animation.setTitleCn(a.attr("title"));
       animation.setCoverUrls(Collections.singletonList(a.attr("data-original")));
       animation.setStatus(status);

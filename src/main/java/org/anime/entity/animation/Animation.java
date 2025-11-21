@@ -15,9 +15,9 @@ import java.io.Serializable;
 public class Animation extends Media implements Serializable {
 
   /**
-   * 子ID，可能用于区分同一动画的不同版本，该字段不从html解析获得
+   * 子ID
    */
-  private Integer subId;
+  private String subId;
 
 
   /**
@@ -73,5 +73,5 @@ public class Animation extends Media implements Serializable {
    * 片长
    */
   private String duration;
-  
+
 }

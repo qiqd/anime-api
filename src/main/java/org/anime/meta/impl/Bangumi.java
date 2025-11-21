@@ -42,7 +42,7 @@ public class Bangumi implements MetaService, Serializable {
    * @return SubjectSearch
    */
   @Override
-  public List<Animation> fetchSubjectSearchSync(String keyword, Integer page, Integer size) throws IOException {
+  public List<Animation> fetchSubjectSearchSync(String keyword, Integer page, Integer size) throws Exception {
     String searchUrl = "/v0/search/subjects";
     HashMap<String, Object> body = new HashMap<>();
     body.put("keyword", keyword);
@@ -65,7 +65,7 @@ public class Bangumi implements MetaService, Serializable {
     return subjects.stream().map(item -> {
       Animation anime = new Animation();
       anime.setId(item.getId().toString());
-      anime.setSubId(item.getId());
+      anime.setSubId(item.getId().toString());
       anime.setTitle(item.getName());
       anime.setTitleCn(item.getName_cn());
       anime.setAriDate(item.getDate());
@@ -89,7 +89,7 @@ public class Bangumi implements MetaService, Serializable {
    * @return List<DailySchedule>
    */
   @Override
-  public List<Schedule> fetchWeeklyUpdateSync() throws IOException {
+  public List<Schedule> fetchWeeklyUpdateSync() throws Exception {
     String url = "/calendar";
     // 使用 Jsoup 替代 OkHttpClient
     Connection connection = HttpUtil.createConnection(baseUrl + url)
@@ -104,7 +104,8 @@ public class Bangumi implements MetaService, Serializable {
       Schedule schedule = new Schedule();
       List<Animation> animeList = item.getItems().stream().map(i -> {
         Animation anime = new Animation();
-        anime.setSubId(i.getId());
+        anime.setId(i.getId().toString());
+        anime.setSubId(i.getId().toString());
         anime.setAriDate(i.getAir_date());
         anime.setTitle(i.getName());
         anime.setTitleCn(i.getName_cn());
@@ -132,7 +133,7 @@ public class Bangumi implements MetaService, Serializable {
    * @return EpisodeResult
    */
   @Override
-  public EpisodeResult fetchEpisodeSync(String subjectId) throws IOException {
+  public EpisodeResult fetchEpisodeSync(String subjectId) throws Exception {
     String url = "/v0/episodes";
     // 构建查询参数
     String fullUrl = baseUrl + url + "?subject_id=" + subjectId;
@@ -154,7 +155,7 @@ public class Bangumi implements MetaService, Serializable {
    * @return Anime
    */
   @Override
-  public Animation fetchSubjectSync(Integer subjectId) throws IOException {
+  public Animation fetchSubjectSync(Integer subjectId) throws Exception {
     String url = "/v0/subjects/" + subjectId;
     // 使用 Jsoup 替代 OkHttpClient
     Connection connection = HttpUtil.createConnection(baseUrl + url)
@@ -164,7 +165,8 @@ public class Bangumi implements MetaService, Serializable {
     String s = connection.execute().body();
     SubjectSearch.Subject subject = JSON.parseObject(s, SubjectSearch.Subject.class);
     Animation anime = new Animation();
-    anime.setSubId(subject.getId());
+    anime.setId(subject.getId().toString());
+    anime.setSubId(subject.getId().toString());
     anime.setTitle(subject.getName());
     anime.setTitleCn(subject.getName_cn());
     anime.setPlatform(subject.getPlatform());

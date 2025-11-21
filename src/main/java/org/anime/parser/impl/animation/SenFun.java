@@ -75,7 +75,7 @@ public class SenFun extends AbstractAnimationParser {
       String genre = StringUtil.removeUnusedChar(infoBox.get(0).text());
       String actor = StringUtil.removeUnusedChar(infoBox.get(1).text());
       Animation animation = new Animation();
-      animation.setId(id);
+      animation.setSubId(id);
       animation.setPlatform(platform.get(0).text());
       animation.setCoverUrls(Collections.singletonList(BASE_URL + coverUrl));
       animation.setTitleCn(titleCn);

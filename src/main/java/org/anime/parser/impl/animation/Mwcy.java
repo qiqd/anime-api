@@ -36,7 +36,7 @@ public class Mwcy extends AbstractAnimationParser {
 
   private Animation fillAnimation(String titleCn, String covet, String id, String director, String actor, String genre) {
     Animation animation = new Animation();
-    animation.setId(id);
+    animation.setSubId(id);
     animation.setTitleCn(titleCn);
     animation.setCoverUrls(Collections.singletonList(covet));
     animation.setDirector(director);

@@ -12,8 +12,8 @@ import org.anime.entity.enumeration.StaffType;
 import org.anime.entity.meta.Item;
 import org.anime.parser.AbstractAnimationParser;
 import org.anime.parser.HtmlParser;
+import org.anime.util.HttpUtil;
 import org.jetbrains.annotations.Nullable;
-import org.jsoup.Jsoup;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
@@ -49,7 +49,7 @@ public class Douban extends AbstractAnimationParser implements HtmlParser, Seria
   public Staff fetchStaffSync(String mediaId) throws Exception {
     //https://movie.douban.com/subject/35936775/celebrities
     String fullUrl = BASE_URL + "/subject/" + mediaId + "/celebrities";
-    Element body = Jsoup.connect(fullUrl).get().body();
+    Element body = HttpUtil.createConnection(fullUrl).get().body();
 
     List<Staff.Person> personList = body.select("li.celebrity").stream().map(item -> {
       String style = item.select("div.avatar").attr("style");
@@ -107,7 +107,7 @@ public class Douban extends AbstractAnimationParser implements HtmlParser, Seria
   public List<Animation> fetchSearchSync(String keyword, Integer page, Integer size) throws Exception {
     //https://search.douban.com/movie/subject_search?search_text=%E3%80%90%E6%88%91%E6%8E%A8%E7%9A%84%E5%AD%A9%E5%AD%90%E3%80%91
     String fullUrl = "https://search.douban.com/movie/subject_search?search_text=" + keyword;
-    Element body = Jsoup.connect(fullUrl).get().body();
+    Element body = HttpUtil.createConnection(fullUrl).get().body();
     List<Element> data = body.getElementsByTag("script").stream().filter(script -> script.data().contains("window.__DATA__")).collect(Collectors.toList());
     String script = data.get(0).data();
     script = script.substring(script.indexOf("["), script.lastIndexOf("]") + 1);
@@ -128,7 +128,7 @@ public class Douban extends AbstractAnimationParser implements HtmlParser, Seria
   @Override
   public Detail<Animation> fetchDetailSync(String mediaId) throws Exception {
     String fullUrl = BASE_URL + "/subject/" + mediaId;
-    Element body = Jsoup.connect(fullUrl).get().body();
+    Element body = HttpUtil.createConnection(fullUrl).get().body();
     String titleCn = body.select("span[property=\"v:itemreviewed\"]").text();
     String cover = body.select("a.nbgnbg img").attr("src");
     String genre = String.join(",", body.select("span[property=\"v:genre\"]").eachText());

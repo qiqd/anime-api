@@ -66,7 +66,7 @@ public class GirigiriLove extends AbstractAnimationParser {
       String description = element.select("span.cor5.thumb-blurb").text().replaceAll(BLANKREG, "");
       String status = String.join("", element.select("div.detail-info.rel.flex-auto.lightSpeedIn div.slide-info.hide.this-wap").get(0).text());
       Animation anime = new Animation();
-      anime.setId(href);
+      anime.setSubId(href);
       anime.setTitleCn(title);
       anime.setDescription(description);
       anime.setDirector(StringUtil.removeUnusedChar(director));
@@ -115,7 +115,7 @@ public class GirigiriLove extends AbstractAnimationParser {
       sources.add(source);
     }
     Animation anime = new Animation();
-    anime.setId(videoId);
+    anime.setSubId(videoId);
     anime.setTitleCn(title);
     anime.setCoverUrls(Collections.singletonList(BASEURL + coverImg));
     anime.setDirector(StringUtil.removeUnusedChar(director));
