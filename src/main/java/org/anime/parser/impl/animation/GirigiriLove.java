@@ -4,10 +4,7 @@ import com.alibaba.fastjson.JSON;
 import org.anime.entity.animation.Animation;
 import org.anime.entity.animation.PlayerData;
 import org.anime.entity.animation.Schedule;
-import org.anime.entity.base.Detail;
-import org.anime.entity.base.Episode;
-import org.anime.entity.base.Source;
-import org.anime.entity.base.ViewInfo;
+import org.anime.entity.base.*;
 import org.anime.loger.Logger;
 import org.anime.loger.LoggerFactory;
 import org.anime.parser.AbstractAnimationParser;
@@ -17,6 +14,7 @@ import org.jetbrains.annotations.Nullable;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import java.io.Serializable;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -26,7 +24,7 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 
-public class GirigiriLove extends AbstractAnimationParser {
+public class GirigiriLove extends AbstractAnimationParser implements Serializable {
   private static final Logger log = LoggerFactory.getLogger(GirigiriLove.class);
 
   public static final String NAME = "Girigiri爱动漫";
@@ -50,111 +48,126 @@ public class GirigiriLove extends AbstractAnimationParser {
   }
 
   @Override
-  public List<Animation> fetchSearchSync(String keyword, Integer page, Integer size) throws Exception {
-    String searchUrl = "/search/-------------/?wd=" + StringUtil.removeBlank(keyword);
-    Element body = HttpUtil.createConnection(BASEURL + searchUrl).get().body();
-    ArrayList<Animation> animations = new ArrayList<>();
-    Elements elements = body.select("div.search-list");
-    for (Element element : elements) {
-      String href = element.select("div.detail-info a").attr("href");
-      String cover = element.select("img.gen-movie-img").attr("data-src");
-      String title = element.select("img.gen-movie-img").attr("alt");
-      String director = String.join(",", element.select("div.slide-info.hide.partition a").eachText());
-      Elements a = element.select("div.slide-info.hide.this-wap.partition");
-      String actor = String.join(",", a.isEmpty() ? Collections.emptyList() : a.get(0).select("a").eachText());
-      String type = String.join(",", a.size() > 1 ? a.get(1).select("a").eachText() : Collections.emptyList());
-      String description = element.select("span.cor5.thumb-blurb").text().replaceAll(BLANKREG, "");
-      String status = String.join("", element.select("div.detail-info.rel.flex-auto.lightSpeedIn div.slide-info.hide.this-wap").get(0).text());
+  public List<Animation> fetchSearchSync(String keyword, Integer page, Integer size, ExceptionHandler exceptionHandler) {
+    try {
+      String searchUrl = "/search/-------------/?wd=" + StringUtil.removeBlank(keyword);
+      Element body = HttpUtil.createConnection(BASEURL + searchUrl).get().body();
+      ArrayList<Animation> animations = new ArrayList<>();
+      Elements elements = body.select("div.search-list");
+      for (Element element : elements) {
+        String href = element.select("div.detail-info a").attr("href");
+        String cover = element.select("img.gen-movie-img").attr("data-src");
+        String title = element.select("img.gen-movie-img").attr("alt");
+        String director = String.join(",", element.select("div.slide-info.hide.partition a").eachText());
+        Elements a = element.select("div.slide-info.hide.this-wap.partition");
+        String actor = String.join(",", a.isEmpty() ? Collections.emptyList() : a.get(0).select("a").eachText());
+        String type = String.join(",", a.size() > 1 ? a.get(1).select("a").eachText() : Collections.emptyList());
+        String description = element.select("span.cor5.thumb-blurb").text().replaceAll(BLANKREG, "");
+        String status = String.join("", element.select("div.detail-info.rel.flex-auto.lightSpeedIn div.slide-info.hide.this-wap").get(0).text());
+        Animation anime = new Animation();
+        anime.setSubId(href);
+        anime.setTitleCn(title);
+        anime.setDescription(description);
+        anime.setDirector(StringUtil.removeUnusedChar(director));
+        anime.setActor(StringUtil.removeUnusedChar(actor));
+        anime.setGenre(StringUtil.removeUnusedChar(type));
+        anime.setStatus(status);
+        anime.setCoverUrls(Collections.singletonList(BASEURL + cover));
+        animations.add(anime);
+      }
+      return animations;
+    } catch (Exception e) {
+      exceptionHandler.handle(e);
+      return Collections.emptyList();
+    }
+  }
+
+  @Override
+  @Nullable
+  public Detail<Animation> fetchDetailSync(String videoId, ExceptionHandler exceptionHandler) {
+    try {
+      Element body = HttpUtil.createConnection(BASEURL + videoId).get().body();
+      Elements detailDiv = body.select("div.vod-detail.style-detail");
+      if (detailDiv.isEmpty()) {
+        log.error("未找到视频详情信息, videoId: {}", videoId);
+        return null;
+      }
+      String coverImg = body.select("div.detail-pic img").attr("data-src");
+      String title = body.select("h3.slide-info-title").text();
+      Element firstRemarksElement = detailDiv.select("div.slide-info span.slide-info-remarks").first();
+      String part1 = firstRemarksElement != null ? firstRemarksElement.text() : "";
+      String part2 = String.join(",", detailDiv.select("div.slide-info a").eachText());
+      String status = part2 + part1;
+      Elements slideInfo = detailDiv.select("div.slide-info");
+      String director = String.join(",", slideInfo.size() > 1 ? slideInfo.get(1).select("a").eachText() : Collections.emptyList());
+      String actor = String.join(",", slideInfo.size() > 2 ? slideInfo.get(2).select("a").eachText() : Collections.emptyList());
+      String type = String.join("", detailDiv.select("a.deployment.none.cor5 span").eachText()).replaceAll("·", ",");
+      String description = detailDiv.select("div#height_limit").text().replaceAll(BLANKREG, "");
+      Elements listBoxDiv = body.select("div.anthology-list-box.none");
+      List<Source> sources = new ArrayList<>();
+      for (Element element : listBoxDiv) {
+        Source source = new Source();
+        List<Episode> episodes = new ArrayList<>();
+        Elements links = element.select("a");
+        for (Element item : links) {
+          Episode episode = new Episode();
+          episode.setId(item.attr("href"));
+          episode.setTitle(item.text());
+          episodes.add(episode);
+        }
+        source.setEpisodes(episodes);
+        sources.add(source);
+      }
       Animation anime = new Animation();
-      anime.setSubId(href);
+      anime.setSubId(videoId);
       anime.setTitleCn(title);
-      anime.setDescription(description);
+      anime.setCoverUrls(Collections.singletonList(BASEURL + coverImg));
       anime.setDirector(StringUtil.removeUnusedChar(director));
       anime.setActor(StringUtil.removeUnusedChar(actor));
       anime.setGenre(StringUtil.removeUnusedChar(type));
       anime.setStatus(status);
-      anime.setCoverUrls(Collections.singletonList(BASEURL + cover));
-      animations.add(anime);
+      anime.setDescription(description);
+      return new Detail<>(anime, null, sources);
+    } catch (Exception e) {
+      exceptionHandler.handle(e);
+      return null;
     }
-    return animations;
   }
 
   @Override
   @Nullable
-  public Detail<Animation> fetchDetailSync(String videoId) throws Exception {
-    Element body = HttpUtil.createConnection(BASEURL + videoId).get().body();
-    Elements detailDiv = body.select("div.vod-detail.style-detail");
-    if (detailDiv.isEmpty()) {
-      log.error("未找到视频详情信息, videoId: {}", videoId);
+  public ViewInfo fetchViewSync(String episodeId, ExceptionHandler exceptionHandler) {
+    try {
+      Element body = HttpUtil.createConnection(BASEURL + episodeId).get().body();
+      Elements scriptElements = body.getElementsByTag("script");
+      String playerData = null;
+      for (org.jsoup.nodes.Element script : scriptElements) {
+        String scriptText = script.data();
+        if (scriptText.contains("player_aaaa")) {
+          playerData = scriptText;
+          break;
+        }
+      }
+      String jsonStr = extractJsonFromScript(playerData);
+      if (jsonStr == null) {
+        log.error("未找到播放信息, episodeId: {}", episodeId);
+        return null;
+      }
+      PlayerData player = JSON.parseObject(jsonStr, PlayerData.class);
+      return new ViewInfo(null, episodeId, Collections.singletonList(decodeUrl(player.getUrl())));
+    } catch (Exception e) {
+      exceptionHandler.handle(e);
       return null;
     }
-    String coverImg = body.select("div.detail-pic img").attr("data-src");
-    String title = body.select("h3.slide-info-title").text();
-    Element firstRemarksElement = detailDiv.select("div.slide-info span.slide-info-remarks").first();
-    String part1 = firstRemarksElement != null ? firstRemarksElement.text() : "";
-    String part2 = String.join(",", detailDiv.select("div.slide-info a").eachText());
-    String status = part2 + part1;
-    Elements slideInfo = detailDiv.select("div.slide-info");
-    String director = String.join(",", slideInfo.size() > 1 ? slideInfo.get(1).select("a").eachText() : Collections.emptyList());
-    String actor = String.join(",", slideInfo.size() > 2 ? slideInfo.get(2).select("a").eachText() : Collections.emptyList());
-    String type = String.join("", detailDiv.select("a.deployment.none.cor5 span").eachText()).replaceAll("·", ",");
-    String description = detailDiv.select("div#height_limit").text().replaceAll(BLANKREG, "");
-    Elements listBoxDiv = body.select("div.anthology-list-box.none");
-    List<Source> sources = new ArrayList<>();
-    for (Element element : listBoxDiv) {
-      Source source = new Source();
-      List<Episode> episodes = new ArrayList<>();
-      Elements links = element.select("a");
-      for (Element item : links) {
-        Episode episode = new Episode();
-        episode.setId(item.attr("href"));
-        episode.setTitle(item.text());
-        episodes.add(episode);
-      }
-      source.setEpisodes(episodes);
-      sources.add(source);
-    }
-    Animation anime = new Animation();
-    anime.setSubId(videoId);
-    anime.setTitleCn(title);
-    anime.setCoverUrls(Collections.singletonList(BASEURL + coverImg));
-    anime.setDirector(StringUtil.removeUnusedChar(director));
-    anime.setActor(StringUtil.removeUnusedChar(actor));
-    anime.setGenre(StringUtil.removeUnusedChar(type));
-    anime.setStatus(status);
-    anime.setDescription(description);
-    return new Detail<>(anime, null, sources);
   }
 
   @Override
-  @Nullable
-  public ViewInfo fetchViewSync(String episodeId) throws Exception {
-    Element body = HttpUtil.createConnection(BASEURL + episodeId).get().body();
-    Elements scriptElements = body.getElementsByTag("script");
-    String playerData = null;
-    for (org.jsoup.nodes.Element script : scriptElements) {
-      String scriptText = script.data();
-      if (scriptText.contains("player_aaaa")) {
-        playerData = scriptText;
-        break;
-      }
-    }
-    String jsonStr = extractJsonFromScript(playerData);
-    if (jsonStr == null) {
-      log.error("未找到播放信息, episodeId: {}", episodeId);
-      return null;
-    }
-    PlayerData player = JSON.parseObject(jsonStr, PlayerData.class);
-    return new ViewInfo(null, episodeId, Collections.singletonList(decodeUrl(player.getUrl())));
-  }
-
-  @Override
-  public String fetchRecommendSync(String html) throws Exception {
+  public String fetchRecommendSync(String html, ExceptionHandler exceptionHandler) {
     return "";
   }
 
   @Override
-  public List<Schedule> fetchWeeklySync() throws Exception {
+  public List<Schedule> fetchWeeklySync(ExceptionHandler exceptionHandler) {
     return Collections.emptyList();
   }
 

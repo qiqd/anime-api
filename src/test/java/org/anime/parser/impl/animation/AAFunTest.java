@@ -1,10 +1,9 @@
-package org.anime.parser.impl;
+package org.anime.parser.impl.animation;
 
 import com.alibaba.fastjson.JSON;
 import org.anime.entity.animation.Animation;
 import org.anime.entity.base.Detail;
 import org.anime.entity.base.ViewInfo;
-import org.anime.parser.impl.animation.AAFun;
 import org.junit.Test;
 
 import java.util.List;
@@ -19,19 +18,19 @@ public class AAFunTest {
    */
   @Test
   public void fetchSearchSync() throws Exception {
-    List<Animation> result = aaFun.fetchSearchSync("未来日记", 1, 10);
+    List<Animation> result = aaFun.fetchSearchSync("未来日记", 1, 10, System.out::println);
     System.out.println(JSON.toJSONString(result));
   }
 
   @Test
   public void fetchDetailSync() throws Exception {
-    Detail<Animation> animationDetail = aaFun.fetchDetailSync("/feng-n/7RCCCS.html");
+    Detail<Animation> animationDetail = aaFun.fetchDetailSync("/feng-n/7RCCCS.html", System.out::println);
     System.out.printf(JSON.toJSONString(animationDetail));
   }
 
   @Test
   public void fetchViewSync() throws Exception {
-    ViewInfo playInfo = aaFun.fetchViewSync("/f/ymCCCS-1-1.html");
+    ViewInfo playInfo = aaFun.fetchViewSync("/f/ymCCCS-1-1.html", System.out::println);
     System.out.println(JSON.toJSONString(playInfo));
   }
 }

@@ -2,10 +2,7 @@ package org.anime.parser.impl.animation;
 
 import org.anime.entity.animation.Animation;
 import org.anime.entity.animation.Schedule;
-import org.anime.entity.base.Detail;
-import org.anime.entity.base.Episode;
-import org.anime.entity.base.Source;
-import org.anime.entity.base.ViewInfo;
+import org.anime.entity.base.*;
 import org.anime.loger.Logger;
 import org.anime.loger.LoggerFactory;
 import org.anime.parser.AbstractAnimationParser;
@@ -18,6 +15,7 @@ import org.jsoup.select.Elements;
 import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
+import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -25,7 +23,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 
-public class MengDao extends AbstractAnimationParser {
+public class MengDao extends AbstractAnimationParser implements Serializable {
   private static final Logger log = LoggerFactory.getLogger(MengDao.class);
 
   public static final String NAME = "萌岛动漫";
@@ -51,131 +49,147 @@ public class MengDao extends AbstractAnimationParser {
   }
 
   @Override
-  public List<Animation> fetchSearchSync(String keyword, Integer page, Integer size) throws Exception {
+  public List<Animation> fetchSearchSync(String keyword, Integer page, Integer size, ExceptionHandler exceptionHandler) {
 //    https://www.mengdao.tv/search.php?searchword=未来日记
-    String searchUrl = BASEURL + "/search.php?searchword=" + StringUtil.removeBlank(keyword);
-    Element doc = HttpUtil.createConnection(searchUrl).post().body();
-    Elements lis = doc.select("div.index-tj.mb.clearfix ul li");
-    return lis.stream().map(item -> {
-      String id = item.select("a.li-hv").attr("href");
-      Elements img = item.select("div.img img");
-      String cover = img.attr("data-original");
-      String titleCn = img.attr("alt");
-      Elements status = item.select("p.bz");
-      String statusText = status.text();
-      Animation animation = new Animation();
-      animation.setSubId(id);
-      animation.setTitleCn(titleCn);
-      animation.setStatus(statusText);
-      animation.setCoverUrls(Collections.singletonList(cover));
-      return animation;
-    }).collect(Collectors.toList());
-  }
-
-  @Override
-  @Nullable
-  public Detail<Animation> fetchDetailSync(String videoId) throws Exception {
-    Element doc = HttpUtil.createConnection(BASEURL + videoId).get().body();
-    Elements episodeBox = doc.select("div.plist.clearfix");
-    List<Source> sources = episodeBox.stream().map(item -> {
-      Source source = new Source();
-      List<Episode> episodes = item.select("ul.urlli li").stream().map(i -> {
-        Elements a = i.select("a");
-        Episode episode = new Episode();
-        episode.setId(a.attr("href"));
-        episode.setTitle(a.text());
-        return episode;
+    try {
+      String searchUrl = BASEURL + "/search.php?searchword=" + StringUtil.removeBlank(keyword);
+      Element doc = HttpUtil.createConnection(searchUrl).post().body();
+      Elements lis = doc.select("div.index-tj.mb.clearfix ul li");
+      return lis.stream().map(item -> {
+        String id = item.select("a.li-hv").attr("href");
+        Elements img = item.select("div.img img");
+        String cover = img.attr("data-original");
+        String titleCn = img.attr("alt");
+        Elements status = item.select("p.bz");
+        String statusText = status.text();
+        Animation animation = new Animation();
+        animation.setSubId(id);
+        animation.setTitleCn(titleCn);
+        animation.setStatus(statusText);
+        animation.setCoverUrls(Collections.singletonList(cover));
+        return animation;
       }).collect(Collectors.toList());
-      source.setEpisodes(episodes);
-      return source;
-    }).collect(Collectors.toList());
-    if (sources.isEmpty()) {
-      log.error("未找到视频源, videoId: {}", videoId);
-      return null;
+    } catch (Exception e) {
+      exceptionHandler.handle(e);
+      return Collections.emptyList();
     }
-    Elements img = doc.select("div.pic img");
-    String cover = img.attr("src");
-    String titleCn = img.attr("alt");
-    Elements infoBox = doc.select("div.info");
-    String status = infoBox.select("dt.name span").text();
-    String subStatus = infoBox.select("dd.m-yc360").text();
-    status += subStatus;
-    List<Element> infoItem = infoBox.select("dd").stream().skip(1).collect(Collectors.toList());
-    String genre = infoItem.isEmpty() ? "" : infoItem.get(0).text();
-    String subGenre = infoItem.size() > 1 ? infoItem.get(1).text() : "";
-    genre += subGenre;
-    String cast = infoItem.size() > 2 ? infoItem.get(2).text() : "";
-    String role = infoItem.size() > 3 ? infoItem.get(3).text() : "";
-    String otherName = infoItem.size() > 4 ? infoItem.get(4).text() : "";
-    String description = Optional.ofNullable(infoBox.select("dt").last()).orElse(new Element("dt")).text();
-    Animation animation = new Animation();
-    animation.setSubId(videoId);
-    animation.setTitleCn(titleCn);
-    animation.setStatus(status);
-    animation.setCoverUrls(Collections.singletonList(cover));
-    animation.setGenre(StringUtil.removeUnusedChar(genre).substring(3));
-    animation.setDescription(description.substring(3));
-    animation.setActor(StringUtil.removeUnusedChar(cast).substring(3));
-    animation.setRole(StringUtil.removeUnusedChar(role).substring(3));
-    animation.setTitleEn(otherName.substring(3).trim());
-    return new Detail<>(animation, null, sources);
   }
 
   @Override
   @Nullable
-  public ViewInfo fetchViewSync(String episodeId) throws Exception {
-    Element doc = HttpUtil.createConnection(BASEURL + episodeId).get().body();
-    List<Element> scripts = doc.select("script").stream().filter(item -> item.data().contains("base64decode")).collect(Collectors.toList());
-    if (scripts.isEmpty()) {
-      log.error("未找到视频信息脚本, episodeId: {}", episodeId);
+  public Detail<Animation> fetchDetailSync(String videoId, ExceptionHandler exceptionHandler) {
+    try {
+      Element doc = HttpUtil.createConnection(BASEURL + videoId).get().body();
+      Elements episodeBox = doc.select("div.plist.clearfix");
+      List<Source> sources = episodeBox.stream().map(item -> {
+        Source source = new Source();
+        List<Episode> episodes = item.select("ul.urlli li").stream().map(i -> {
+          Elements a = i.select("a");
+          Episode episode = new Episode();
+          episode.setId(a.attr("href"));
+          episode.setTitle(a.text());
+          return episode;
+        }).collect(Collectors.toList());
+        source.setEpisodes(episodes);
+        return source;
+      }).collect(Collectors.toList());
+      if (sources.isEmpty()) {
+        log.error("未找到视频源, videoId: {}", videoId);
+        return null;
+      }
+      Elements img = doc.select("div.pic img");
+      String cover = img.attr("src");
+      String titleCn = img.attr("alt");
+      Elements infoBox = doc.select("div.info");
+      String status = infoBox.select("dt.name span").text();
+      String subStatus = infoBox.select("dd.m-yc360").text();
+      status += subStatus;
+      List<Element> infoItem = infoBox.select("dd").stream().skip(1).collect(Collectors.toList());
+      String genre = infoItem.isEmpty() ? "" : infoItem.get(0).text();
+      String subGenre = infoItem.size() > 1 ? infoItem.get(1).text() : "";
+      genre += subGenre;
+      String cast = infoItem.size() > 2 ? infoItem.get(2).text() : "";
+      String role = infoItem.size() > 3 ? infoItem.get(3).text() : "";
+      String otherName = infoItem.size() > 4 ? infoItem.get(4).text() : "";
+      String description = Optional.ofNullable(infoBox.select("dt").last()).orElse(new Element("dt")).text();
+      Animation animation = new Animation();
+      animation.setSubId(videoId);
+      animation.setTitleCn(titleCn);
+      animation.setStatus(status);
+      animation.setCoverUrls(Collections.singletonList(cover));
+      animation.setGenre(StringUtil.removeUnusedChar(genre).substring(3));
+      animation.setDescription(description.substring(3));
+      animation.setActor(StringUtil.removeUnusedChar(cast).substring(3));
+      animation.setRole(StringUtil.removeUnusedChar(role).substring(3));
+      animation.setTitleEn(otherName.substring(3).trim());
+      return new Detail<>(animation, null, sources);
+    } catch (Exception e) {
+      exceptionHandler.handle(e);
       return null;
     }
-    String data = scripts.get(0).data();
-    String videoInfo = data.substring(data.indexOf("(") + 2, data.lastIndexOf(")") - 1);
-    byte[] decode = Base64.getDecoder().decode(videoInfo);
-    // 创建AES密钥和IV参数
-    String decodedVideoInfo = new String(decode, StandardCharsets.UTF_8);
-    SecretKeySpec keySpec = new SecretKeySpec(AES_KEY.getBytes(StandardCharsets.UTF_8), "AES");
-    IvParameterSpec ivSpec = new IvParameterSpec(AES_IV.getBytes(StandardCharsets.UTF_8));
-    // 使用NoPadding模式
-    Cipher cipher = Cipher.getInstance("AES/CBC/NoPadding");
-    cipher.init(Cipher.DECRYPT_MODE, keySpec, ivSpec);
-    byte[] base64Decoded = Base64.getDecoder().decode(decodedVideoInfo);
-    // 执行AES解密
-    byte[] decryptedBytes = cipher.doFinal(base64Decoded);
-    // 检查末尾填充情况
-    int zeroCount = 0;
-    for (int i = decryptedBytes.length - 1; i >= 0; i--) {
-      if (decryptedBytes[i] == 0) {
-        zeroCount++;
-      } else {
-        break;
-      }
-    }
-    // 手动去除ZeroPadding填充（ZeroPadding在末尾补0）
-    int endIndex = decryptedBytes.length;
-    for (int i = decryptedBytes.length - 1; i >= 0; i--) {
-      if (decryptedBytes[i] != 0) {
-        endIndex = i + 1;
-        break;
-      }
-    }
-    // 复制有效数据
-    byte[] validData = new byte[endIndex];
-    System.arraycopy(decryptedBytes, 0, validData, 0, endIndex);
-    String result = new String(validData, StandardCharsets.UTF_8);
-    VideoData videoData = parseVideoData(result);
-    String currentVideoUrl = getCurrentVideoUrl(videoData, BASEURL + episodeId);
-    return new ViewInfo(null, episodeId, Collections.singletonList(currentVideoUrl));
   }
 
   @Override
-  public String fetchRecommendSync(String html) throws Exception {
+  @Nullable
+  public ViewInfo fetchViewSync(String episodeId, ExceptionHandler exceptionHandler) {
+    try {
+      Element doc = HttpUtil.createConnection(BASEURL + episodeId).get().body();
+      List<Element> scripts = doc.select("script").stream().filter(item -> item.data().contains("base64decode")).collect(Collectors.toList());
+      if (scripts.isEmpty()) {
+        log.error("未找到视频信息脚本, episodeId: {}", episodeId);
+        return null;
+      }
+      String data = scripts.get(0).data();
+      String videoInfo = data.substring(data.indexOf("(") + 2, data.lastIndexOf(")") - 1);
+      byte[] decode = Base64.getDecoder().decode(videoInfo);
+      // 创建AES密钥和IV参数
+      String decodedVideoInfo = new String(decode, StandardCharsets.UTF_8);
+      SecretKeySpec keySpec = new SecretKeySpec(AES_KEY.getBytes(StandardCharsets.UTF_8), "AES");
+      IvParameterSpec ivSpec = new IvParameterSpec(AES_IV.getBytes(StandardCharsets.UTF_8));
+      // 使用NoPadding模式
+      Cipher cipher = Cipher.getInstance("AES/CBC/NoPadding");
+      cipher.init(Cipher.DECRYPT_MODE, keySpec, ivSpec);
+      byte[] base64Decoded = Base64.getDecoder().decode(decodedVideoInfo);
+      // 执行AES解密
+      byte[] decryptedBytes = cipher.doFinal(base64Decoded);
+      // 检查末尾填充情况
+      int zeroCount = 0;
+      for (int i = decryptedBytes.length - 1; i >= 0; i--) {
+        if (decryptedBytes[i] == 0) {
+          zeroCount++;
+        } else {
+          break;
+        }
+      }
+      // 手动去除ZeroPadding填充（ZeroPadding在末尾补0）
+      int endIndex = decryptedBytes.length;
+      for (int i = decryptedBytes.length - 1; i >= 0; i--) {
+        if (decryptedBytes[i] != 0) {
+          endIndex = i + 1;
+          break;
+        }
+      }
+      // 复制有效数据
+      byte[] validData = new byte[endIndex];
+      System.arraycopy(decryptedBytes, 0, validData, 0, endIndex);
+      String result = new String(validData, StandardCharsets.UTF_8);
+      VideoData videoData = parseVideoData(result);
+      String currentVideoUrl = getCurrentVideoUrl(videoData, BASEURL + episodeId);
+      return new ViewInfo(null, episodeId, Collections.singletonList(currentVideoUrl));
+    } catch (Exception e) {
+      exceptionHandler.handle(e);
+      return null;
+    }
+  }
+
+
+  @Override
+  public String fetchRecommendSync(String html, ExceptionHandler exceptionHandler) {
     return "";
   }
 
   @Override
-  public List<Schedule> fetchWeeklySync() throws Exception {
+  public List<Schedule> fetchWeeklySync(ExceptionHandler exceptionHandler) {
     return Collections.emptyList();
   }
 

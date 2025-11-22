@@ -1,8 +1,7 @@
-package org.anime.parser.impl;
+package org.anime.parser.impl.animation;
 
 import com.alibaba.fastjson.JSON;
 import junit.framework.TestCase;
-import org.anime.parser.impl.animation.Mwcy;
 
 public class MwcyTest extends TestCase {
   private final Mwcy mwcy = new Mwcy();
@@ -13,14 +12,14 @@ public class MwcyTest extends TestCase {
    * @throws Exception
    */
   public void testFetchSearchSync() throws Exception {
-    System.out.println(JSON.toJSONString(mwcy.fetchSearchSync("一拳超人 第三季", 1, 12)));
+    System.out.println(JSON.toJSONString(mwcy.fetchSearchSync("一拳超人 第三季", 1, 12, System.out::println)));
   }
 
   public void testFetchDetailSync() throws Exception {
-    System.out.println(JSON.toJSONString(mwcy.fetchDetailSync("/bangumi/MFxCCS.html")));
+    System.out.println(JSON.toJSONString(mwcy.fetchDetailSync("/bangumi/MFxCCS.html", System.out::println)));
   }
 
   public void testFetchViewSync() throws Exception {
-    System.out.println(JSON.toJSONString(mwcy.fetchViewSync("/play/MFxCCS-1-1.html")));
+    System.out.println(JSON.toJSONString(mwcy.fetchViewSync("/play/MFxCCS-1-1.html", System.out::println)));
   }
 }

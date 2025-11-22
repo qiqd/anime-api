@@ -17,7 +17,7 @@ public class AnimationApiTest {
     System.out.println(AnimationApi.SOURCES_WITH_DELAY);
     List<SourceWithDelay<AbstractAnimationParser>> delays = AnimationApi.SOURCES_WITH_DELAY;
     SourceWithDelay<AbstractAnimationParser> source = delays.get(0);
-    List<Animation> jojo = source.getHtmlParser().fetchSearchSync("JOJO", 1, 10);
+    List<Animation> jojo = source.getHtmlParser().fetchSearchSync("JOJO", 1, 10, System.out::println);
     System.out.println(JSON.toJSONString(jojo));
   }
 

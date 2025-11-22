@@ -1,11 +1,10 @@
-package org.anime.parser.impl;
+package org.anime.parser.impl.animation;
 
 import com.alibaba.fastjson.JSON;
 import junit.framework.TestCase;
 import org.anime.entity.animation.Animation;
 import org.anime.entity.base.Detail;
 import org.anime.entity.base.ViewInfo;
-import org.anime.parser.impl.animation.GirigiriLove;
 
 import java.util.List;
 
@@ -13,7 +12,7 @@ public class GirigiriLoveTest extends TestCase {
   private final GirigiriLove girigiriLove = new GirigiriLove();
 
   public void testFetchSearchSync() throws Exception {
-    List<Animation> animations = girigiriLove.fetchSearchSync("JOJO的奇妙冒险", 10, 1);
+    List<Animation> animations = girigiriLove.fetchSearchSync("JOJO的奇妙冒险", 10, 1, System.out::println);
     System.out.println(JSON.toJSONString(animations));
   }
 
@@ -23,12 +22,12 @@ public class GirigiriLoveTest extends TestCase {
    * @throws Exception
    */
   public void testFetchDetailSync() throws Exception {
-    Detail<Animation> animationDetail = girigiriLove.fetchDetailSync("/GV765/");
+    Detail<Animation> animationDetail = girigiriLove.fetchDetailSync("/GV765/", System.out::println);
     System.out.println(JSON.toJSONString(animationDetail));
   }
 
   public void testFetchViewSync() throws Exception {
-    ViewInfo playInfo = girigiriLove.fetchViewSync("/playGV765-1-1/");
+    ViewInfo playInfo = girigiriLove.fetchViewSync("/playGV765-1-1/", System.out::println);
     System.out.println(JSON.toJSONString(playInfo));
   }
 }

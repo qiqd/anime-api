@@ -54,9 +54,7 @@ public class StringUtil implements Serializable {
       } else {
         // 英文或其他字符，根据位置和上下文判断
         if (japaneseTitle.length() > 0) {
-          if (japaneseTitle.length() > 0) {
-            japaneseTitle.append(" ");
-          }
+          japaneseTitle.append(" ");
           japaneseTitle.append(part);
         } else {
           if (chineseTitle.length() > 0) {
@@ -84,9 +82,9 @@ public class StringUtil implements Serializable {
    * 检查字符串是否包含日文字符（平假名、片假名）
    */
   private static boolean containsJapaneseCharacters(String text) {
-    // 平假名范围：\u3040-\u309F
-    // 片假名范围：\u30A0-\u30FF
-    // 日文汉字范围：\u4E00-\u9FFF（部分）
+    // 平假名范围：\u3040-ゟ
+    // 片假名范围：゠-ヿ
+    // 日文汉字范围：一-鿿（部分）
     return text.matches(".*[\\u3040-\\u309F\\u30A0-\\u30FF].*");
   }
 
