@@ -48,7 +48,7 @@ public class Animation extends Media implements Serializable {
   /**
    * 总集数
    */
-  private Integer totalEpisode;
+  private String totalEpisode;
 
 
   /**

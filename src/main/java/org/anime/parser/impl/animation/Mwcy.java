@@ -38,7 +38,7 @@ public class Mwcy extends AbstractAnimationParser implements Serializable {
 
   private Animation fillAnimation(String titleCn, String covet, String id, String director, String actor, String genre) {
     Animation animation = new Animation();
-    animation.setSubId(id);
+    animation.setId(id);
     animation.setTitleCn(titleCn);
     animation.setCoverUrls(Collections.singletonList(covet));
     animation.setDirector(director);
@@ -123,6 +123,7 @@ public class Mwcy extends AbstractAnimationParser implements Serializable {
       String rating = doc.select("div.fraction").text();
       String totalRating = doc.select("span.text-site.cor2").text();
       String introduction = doc.select("div#height_limit").text();
+      animation.setId(videoId);
       animation.setRating(rating);
       animation.setRatingCount(totalRating);
       animation.setDescription(introduction);

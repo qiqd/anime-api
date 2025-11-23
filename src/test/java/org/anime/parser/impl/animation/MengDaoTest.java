@@ -14,6 +14,10 @@ public class MengDaoTest extends TestCase {
   public void testFetchSearchSync() throws Exception {
     List<Animation> animations = mengDao.fetchSearchSync("JOJO的奇妙冒险", 1, 10, System.out::println);
     System.out.println(JSON.toJSONString(animations));
+    Detail<Animation> animationDetail = mengDao.fetchDetailSync("/man/99232.html", System.out::println);
+    System.out.println(JSON.toJSONString(animationDetail));
+    ViewInfo playInfo = mengDao.fetchViewSync("/man_v/9232-0-0.html", System.out::println);
+    System.out.println(JSON.toJSONString(playInfo));
   }
 
   public void testFetchDetailSync() throws Exception {

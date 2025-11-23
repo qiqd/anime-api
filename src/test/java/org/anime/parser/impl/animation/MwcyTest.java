@@ -12,7 +12,9 @@ public class MwcyTest extends TestCase {
    * @throws Exception
    */
   public void testFetchSearchSync() throws Exception {
-    System.out.println(JSON.toJSONString(mwcy.fetchSearchSync("一拳超人 第三季", 1, 12, System.out::println)));
+    System.out.println(JSON.toJSONString(mwcy.fetchSearchSync("我推的孩子", 1, 12, System.out::println)));
+    System.out.println(JSON.toJSONString(mwcy.fetchDetailSync("/bangumi/MFxCCS.html", System.out::println)));
+    System.out.println(JSON.toJSONString(mwcy.fetchViewSync("/play/MFxCCS-1-1.html", System.out::println)));
   }
 
   public void testFetchDetailSync() throws Exception {

@@ -58,7 +58,7 @@ public class AAFun extends AbstractAnimationParser implements Serializable {
         Elements a = item.select("div.hl-item-div a");
         String status = item.select("span.hl-lc-1.remarks").text();
         Animation animation = new Animation();
-        animation.setSubId(a.attr("href"));
+        animation.setId(a.attr("href"));
         animation.setTitleCn(a.attr("title"));
         animation.setCoverUrls(Collections.singletonList(a.attr("data-original")));
         animation.setStatus(status);
@@ -89,11 +89,8 @@ public class AAFun extends AbstractAnimationParser implements Serializable {
         }).collect(Collectors.toList());
         return new Source(null, null, episodes);
       }).collect(Collectors.toList());
-      if (sources.isEmpty()) {
-        log.error("No source found for videoId: {}", videoId);
-        return null;
-      }
       Animation animation = new Animation();
+      animation.setId(videoId);
       // 解析封面图片
       Elements picElements = document.select(".hl-dc-pic .hl-item-thumb");
       if (!picElements.isEmpty()) {

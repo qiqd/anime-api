@@ -15,5 +15,5 @@ import java.util.List;
 public class Detail<T extends Media> implements Serializable {
   private T media;
   private List<T> series;
-  private List<Source> episodes;
+  private List<Source> sources;
 }

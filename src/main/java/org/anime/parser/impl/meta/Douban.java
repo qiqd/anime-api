@@ -51,8 +51,9 @@ public class Douban extends AbstractAnimationParser implements Serializable {
   public Staff fetchStaffSync(String mediaId, ExceptionHandler exceptionHandler) {
     try {
       //https://movie.douban.com/subject/35936775/celebrities
+      //https://movie.douban.com/
       String fullUrl = BASE_URL + "/subject/" + mediaId + "/celebrities";
-      Element body = HttpUtil.createConnection(fullUrl).get().body();
+      Element body = HttpUtil.createConnection(fullUrl, BASE_URL).get().body();
 
       List<Staff.Person> personList = body.select("li.celebrity").stream().map(item -> {
         String style = item.select("div.avatar").attr("style");
@@ -70,7 +71,9 @@ public class Douban extends AbstractAnimationParser implements Serializable {
                 .imageUrl(Collections.singletonList(cover))
                 .build();
       }).collect(Collectors.toList());
-      Map<StaffType, List<Staff.Person>> map = personList.stream().collect(Collectors.groupingBy(Staff.Person::getType));
+      Map<StaffType, List<Staff.Person>> map = personList.stream()
+              .filter(person -> person.getType() != null)
+              .collect(Collectors.groupingBy(Staff.Person::getType));
       return Staff.builder()
               .mediaId(mediaId)
               .actors(map.get(StaffType.ACTOR))
@@ -101,7 +104,7 @@ public class Douban extends AbstractAnimationParser implements Serializable {
     if (role.contains("Music") || role.contains("作曲") || role.contains("作词")) {
       type = StaffType.MUSICIAN;
     }
-    if (role.contains("Animator")) {
+    if (role.contains("Animator") || role.contains("动画师") || role.contains("监督")) {
       type = StaffType.ANIMATOR;
     }
     if (role.contains("Producer")) {
@@ -115,7 +118,7 @@ public class Douban extends AbstractAnimationParser implements Serializable {
     try {
       //https://search.douban.com/movie/subject_search?search_text=%E3%80%90%E6%88%91%E6%8E%A8%E7%9A%84%E5%AD%A9%E5%AD%90%E3%80%91
       String fullUrl = "https://search.douban.com/movie/subject_search?search_text=" + keyword;
-      Element body = HttpUtil.createConnection(fullUrl).get().body();
+      Element body = HttpUtil.createConnection(fullUrl, BASE_URL).get().body();
       List<Element> data = body.getElementsByTag("script").stream().filter(script -> script.data().contains("window.__DATA__")).collect(Collectors.toList());
       String script = data.get(0).data();
       script = script.substring(script.indexOf("["), script.lastIndexOf("]") + 1);
@@ -126,7 +129,7 @@ public class Douban extends AbstractAnimationParser implements Serializable {
         String titleCn = titles.get("titleCn");
         String title = titles.get("title");
         return Animation.builder()
-                .id(item.getId().toString())
+                .subId(item.getId().toString())
                 .titleCn(titleCn)
                 .title(title)
                 .coverUrls(Collections.singletonList(item.getCover_url()))
@@ -148,9 +151,9 @@ public class Douban extends AbstractAnimationParser implements Serializable {
   @Override
   public Detail<Animation> fetchDetailSync(String mediaId, ExceptionHandler exceptionHandler) {
     try {
-      String fullUrl = BASE_URL + "/subject/" + mediaId;
-      Element body = HttpUtil.createConnection(fullUrl).get().body();
-      String titleCn = body.select("span[property=\"v:itemreviewed\"]").text();
+      String fullUrl = BASE_URL + "/subject/" + mediaId + "/";
+      Element body = HttpUtil.createConnection(fullUrl, BASE_URL).get().body();
+      String title = body.select("span[property=\"v:itemreviewed\"]").text();
       String cover = body.select("a.nbgnbg img").attr("src");
       String genre = String.join(",", body.select("span[property=\"v:genre\"]").eachText());
       Elements span = body.select("span.pl");
@@ -159,25 +162,25 @@ public class Douban extends AbstractAnimationParser implements Serializable {
       String language = Optional.ofNullable(span.get(5).nextSibling()).orElse(new Element("div")).toString();
       String totalEpisode = Optional.ofNullable(span.get(7).nextSibling()).orElse(new Element("div")).toString();
       String duration = Optional.ofNullable(span.get(8).nextSibling()).orElse(new Element("div")).toString();
-      String otherName = Optional.ofNullable(span.get(8).nextSibling()).orElse(new Element("div")).toString();
       String rating = body.select("strong[property=\"v:average\"]").text();
-      String ratingCount = body.select("strong[property=\"v:votes\"]").text();
-      String summary = body.select("strong[property=\"v:summary\"]").html().replaceAll("<br/>", "\r\n");
+      String ratingCount = body.select("span[property=\"v:votes\"]").text();
+      String summary = body.select("span[property=\"v:summary\"]").html().replaceAll("<br/>", "\r\n");
+      Map<String, String> titles = StringUtil.separateTitles(title);
       List<Element> scripts = body.getElementsByTag("script").stream().filter(script -> script.data().contains("SERIES_OTHER_SUBJECTS")).collect(Collectors.toList());
       Animation animation = Animation.builder()
-              .id(mediaId)
+              .subId(mediaId)
               .coverUrls(Collections.singletonList(cover))
-              .titleCn(titleCn)
-              .title(otherName)
-              .genre(genre)
+              .titleCn(titles.get("titleCn"))
+              .title(titles.get("title"))
+              .genre(genre.trim())
               .status("")
-              .rating(rating)
-              .ratingCount(ratingCount)
+              .rating(rating.trim())
+              .ratingCount(ratingCount.trim())
               .description(summary)
-              .country(country)
-              .language(language)
-              .totalEpisode(Integer.parseInt(totalEpisode.trim()))
-              .duration(duration)
+              .country(country.trim())
+              .language(language.trim())
+              .totalEpisode(totalEpisode.trim())
+              .duration(duration.trim())
               .ariDate(releaseDate)
               .build();
       Detail<Animation> detail = new Detail<>();

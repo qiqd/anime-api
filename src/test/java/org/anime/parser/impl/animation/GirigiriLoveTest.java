@@ -14,6 +14,10 @@ public class GirigiriLoveTest extends TestCase {
   public void testFetchSearchSync() throws Exception {
     List<Animation> animations = girigiriLove.fetchSearchSync("JOJO的奇妙冒险", 10, 1, System.out::println);
     System.out.println(JSON.toJSONString(animations));
+    Detail<Animation> animationDetail = girigiriLove.fetchDetailSync("/GV765/", System.out::println);
+    System.out.println(JSON.toJSONString(animationDetail));
+    ViewInfo playInfo = girigiriLove.fetchViewSync("/playGV765-1-1/", System.out::println);
+    System.out.println(JSON.toJSONString(playInfo));
   }
 
   /**

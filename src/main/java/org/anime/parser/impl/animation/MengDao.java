@@ -63,7 +63,7 @@ public class MengDao extends AbstractAnimationParser implements Serializable {
         Elements status = item.select("p.bz");
         String statusText = status.text();
         Animation animation = new Animation();
-        animation.setSubId(id);
+        animation.setId(id);
         animation.setTitleCn(titleCn);
         animation.setStatus(statusText);
         animation.setCoverUrls(Collections.singletonList(cover));
@@ -113,7 +113,7 @@ public class MengDao extends AbstractAnimationParser implements Serializable {
       String otherName = infoItem.size() > 4 ? infoItem.get(4).text() : "";
       String description = Optional.ofNullable(infoBox.select("dt").last()).orElse(new Element("dt")).text();
       Animation animation = new Animation();
-      animation.setSubId(videoId);
+      animation.setId(videoId);
       animation.setTitleCn(titleCn);
       animation.setStatus(status);
       animation.setCoverUrls(Collections.singletonList(cover));

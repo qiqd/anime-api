@@ -74,7 +74,7 @@ public class SenFun extends AbstractAnimationParser implements Serializable {
         String genre = StringUtil.removeUnusedChar(infoBox.get(0).text());
         String actor = StringUtil.removeUnusedChar(infoBox.get(1).text());
         Animation animation = new Animation();
-        animation.setSubId(id);
+        animation.setId(id);
         animation.setPlatform(platform.get(0).text());
         animation.setCoverUrls(Collections.singletonList(BASE_URL + coverUrl));
         animation.setTitleCn(titleCn);
@@ -115,6 +115,7 @@ public class SenFun extends AbstractAnimationParser implements Serializable {
       String duration = infoItem.size() > 5 ? infoItem.get(5).select("div.module-info-item-content").text() : "";
       String totalEpisode = infoItem.size() > 7 ? infoItem.get(7).select("div.module-info-item-content").text() : "";
       Animation animation = new Animation();
+      animation.setId(videoId);
       animation.setCoverUrls(Collections.singletonList(BASE_URL + cover));
       animation.setTitleCn(titleCn);
       animation.setGenre(StringUtil.removeUnusedChar(genre));
@@ -124,7 +125,7 @@ public class SenFun extends AbstractAnimationParser implements Serializable {
       animation.setActor(actor);
       animation.setAriDate(airDate);
       animation.setDuration(duration);
-      animation.setTotalEpisode(Integer.parseInt(totalEpisode));
+      animation.setTotalEpisode(totalEpisode);
       return new Detail<>(animation, null, sources);
     } catch (Exception e) {
       exceptionHandler.handle(e);

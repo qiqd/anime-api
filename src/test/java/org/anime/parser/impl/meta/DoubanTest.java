@@ -19,6 +19,6 @@ public class DoubanTest extends TestCase {
   }
 
   public void testFetchDetailSync() throws Exception {
-    System.out.println(JSON.toJSONString(douban.fetchStaffSync("11498785", System.out::println)));
+    System.out.println(JSON.toJSONString(douban.fetchStaffSync("23774708", System.out::println)));
   }
 }

@@ -8,7 +8,13 @@ public class SenFunTest extends TestCase {
   private final static SenFun senFun = new SenFun();
 
   public void testFetchSearchSync() throws Exception {
-    System.out.println(JSON.toJSONString(senFun.fetchSearchSync("jojo", 1, 10, System.out::println)));
+    for (int i = 0; i < 5; i++) {
+      System.out.println(JSON.toJSONString(senFun.fetchSearchSync("JOJO的奇妙冒险", 1, 10, System.out::println)));
+      System.out.println(JSON.toJSONString(senFun.fetchDetailSync("/voddetail/1993743391.html", System.out::println)));
+      ViewInfo playInfo = senFun.fetchViewSync("/vodwatch/1993743391/ep4.html", System.out::println);
+      System.out.println(JSON.toJSONString(playInfo));
+      Thread.sleep(2000L);
+    }
   }
 
   public void testFetchDetailSync() throws Exception {

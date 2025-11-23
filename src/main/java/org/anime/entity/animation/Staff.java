@@ -28,7 +28,7 @@ public class Staff implements Serializable {
   @SuperBuilder
   @AllArgsConstructor
   @NoArgsConstructor
-  public static class Person {
+  public static class Person implements Serializable {
     private String nameCn;
     private List<String> otherNames;
     private StaffType type;

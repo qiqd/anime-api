@@ -29,7 +29,7 @@ public class AiyiFan extends AbstractAnimationParser implements Serializable {
 
   private Animation fillAnimation(String videoId, String titleCN, String cover, String status, String genre, String actor, String director, String country) {
     Animation animation = new Animation();
-    animation.setSubId(videoId);
+    animation.setId(videoId);
     animation.setTitleCn(titleCN);
     animation.setCoverUrls(Collections.singletonList(cover));
     animation.setStatus(status);
@@ -135,6 +135,7 @@ public class AiyiFan extends AbstractAnimationParser implements Serializable {
       String ariDate = infoBox.size() > 7 ? infoBox.get(7).ownText() : "";
       String description = doc.select("span.details-content-all").text();
       Animation animation = fillAnimation(videoId, titleCN, cover, status, genre, actor, director, country);
+      animation.setId(videoId);
       animation.setLanguage(language);
       animation.setAriDate(ariDate);
       animation.setDescription(description);

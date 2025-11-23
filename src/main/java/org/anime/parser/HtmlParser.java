@@ -5,7 +5,6 @@ import org.anime.entity.base.Detail;
 import org.anime.entity.base.ExceptionHandler;
 import org.anime.entity.base.Media;
 import org.anime.entity.base.ViewInfo;
-import org.jetbrains.annotations.Nullable;
 
 import java.io.Serializable;
 import java.util.List;
@@ -49,7 +48,6 @@ public interface HtmlParser extends Serializable {
    * @param exceptionHandler 异常处理器
    * @return AnimeDetail
    */
-  @Nullable
   Detail<? extends Media> fetchDetailSync(String mediaId, ExceptionHandler exceptionHandler);
 
   /**
@@ -59,7 +57,6 @@ public interface HtmlParser extends Serializable {
    * @param exceptionHandler 异常处理器
    * @return PlayInfo
    */
-  @Nullable
   ViewInfo fetchViewSync(String episodeId, ExceptionHandler exceptionHandler);
 
   /**

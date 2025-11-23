@@ -71,7 +71,7 @@ public class Bangumi implements MetaService, Serializable {
       anime.setAriDate(item.getDate());
       anime.setDescription(item.getSummary());
       anime.setGenre(String.join(",", Optional.ofNullable(item.getMeta_tags()).orElse(Collections.emptyList())));
-      anime.setTotalEpisode(item.getEps());
+      anime.setTotalEpisode(item.getEps().toString());
       anime.setCoverUrls(Collections.singletonList(item.getImages().getLarge()));
       return anime;
     }).collect(Collectors.toList());
@@ -170,12 +170,12 @@ public class Bangumi implements MetaService, Serializable {
     anime.setTitle(subject.getName());
     anime.setTitleCn(subject.getName_cn());
     anime.setPlatform(subject.getPlatform());
-    anime.setTotalEpisode(subject.getEps());
+    anime.setTotalEpisode(subject.getEps().toString());
     anime.setDescription(subject.getSummary());
     if (subject.getMeta_tags() != null) {
       anime.setGenre(String.join(",", subject.getMeta_tags()));
     }
-    anime.setTotalEpisode(subject.getEps());
+    anime.setTotalEpisode(subject.getEps().toString());
     if (subject.getImages() != null) {
       anime.setCoverUrls(Collections.singletonList(subject.getImages().getLarge()));
     }
