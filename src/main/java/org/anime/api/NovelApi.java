@@ -4,7 +4,6 @@ import org.anime.entity.meta.SourceWithDelay;
 import org.anime.loger.Logger;
 import org.anime.loger.LoggerFactory;
 import org.anime.parser.AbstractNovelParser;
-import org.anime.parser.impl.animation.AAFun;
 import org.anime.parser.impl.novel.Huanmeng;
 import org.anime.util.HttpUtil;
 
@@ -19,7 +18,7 @@ public class NovelApi implements Serializable {
   public static final HashMap<String, AbstractNovelParser> SOURCE_MAP = new HashMap<>();
 
   static {
-    SOURCE_MAP.put(AAFun.NAME, new Huanmeng());
+    SOURCE_MAP.put(Huanmeng.NAME, new Huanmeng());
   }
 
   public static void moveToTop(int index) {

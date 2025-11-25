@@ -5,16 +5,14 @@ import com.alibaba.fastjson.TypeReference;
 import org.anime.entity.animation.Animation;
 import org.anime.entity.animation.Schedule;
 import org.anime.entity.animation.Staff;
-import org.anime.entity.base.Detail;
-import org.anime.entity.base.ExceptionHandler;
-import org.anime.entity.base.Media;
-import org.anime.entity.base.ViewInfo;
+import org.anime.entity.base.*;
 import org.anime.entity.enumeration.StaffType;
 import org.anime.entity.meta.Item;
 import org.anime.parser.AbstractAnimationParser;
 import org.anime.util.HttpUtil;
 import org.anime.util.StringUtil;
 import org.jetbrains.annotations.Nullable;
+import org.jsoup.Jsoup;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
@@ -22,7 +20,6 @@ import java.io.Serializable;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -83,6 +80,72 @@ public class Douban extends AbstractAnimationParser implements Serializable {
               .musicians(map.get(StaffType.MUSICIAN))
               .writers(map.get(StaffType.WRITER))
               .build();
+    } catch (Exception e) {
+      exceptionHandler.handle(e);
+      return null;
+    }
+  }
+
+  @Nullable
+  public Detail<Animation> fetchDetailFromHtml(String html, String mediaId, ExceptionHandler exceptionHandler) {
+    try {
+      Element body = Jsoup.parse(html).body();
+      String title = body.select("span[property=\"v:itemreviewed\"]").text();
+      String cover = body.select("a.nbgnbg img").attr("src");
+      String genre = String.join(",", body.select("span[property=\"v:genre\"]").eachText());
+      Elements span = body.select("span.pl");
+      String releaseDate = body.select("span[property=\"v:initialReleaseDate\"]").text();
+      String country = span.size() > 4 ? String.valueOf(span.get(4).nextSibling()) : "";
+      String language = span.size() > 5 ? String.valueOf(span.get(5).nextSibling()) : "";
+      String totalEpisode = span.size() > 6 ? String.valueOf(span.get(6).nextSibling()) : "";
+      String duration = span.size() > 7 ? String.valueOf(span.get(7).nextSibling()) : "";
+      String rating = body.select("strong[property=\"v:average\"]").text();
+      String ratingCount = body.select("span[property=\"v:votes\"]").text();
+      String summary = body.select("span[property=\"v:summary\"]").html().replaceAll("<br/>", "\r\n");
+      Map<String, String> titles = StringUtil.separateTitles(title);
+      List<Element> scripts = body.getElementsByTag("script").stream().filter(script -> script.data().contains("SERIES_OTHER_SUBJECTS")).collect(Collectors.toList());
+      Elements ratingInfoBox = body.select("div.ratings-on-weight .item");
+      String fiveStar = ratingInfoBox.isEmpty() ? "" : ratingInfoBox.get(0).select("span.rating_per").text();
+      String fourStar = ratingInfoBox.size() > 1 ? ratingInfoBox.get(1).select("span.rating_per").text() : "";
+      String threeStar = ratingInfoBox.size() > 2 ? ratingInfoBox.get(2).select("span.rating_per").text() : "";
+      String twoStar = ratingInfoBox.size() > 3 ? ratingInfoBox.get(3).select("span.rating_per").text() : "";
+      String oneStar = ratingInfoBox.size() > 4 ? ratingInfoBox.get(4).select("span.rating_per").text() : "";
+      RatingInfo ratingInfo = new RatingInfo(rating, ratingCount, fiveStar, fourStar, threeStar, twoStar, oneStar);
+      Animation animation = Animation.builder()
+              .subId(mediaId)
+              .coverUrls(Collections.singletonList(cover))
+              .titleCn(titles.get("titleCn"))
+              .title(titles.get("title"))
+              .genre(genre.trim())
+              .status("")
+              .ratingInfo(ratingInfo)
+              .rating(rating.trim())
+              .ratingCount(ratingCount.trim())
+              .description(summary)
+              .country(country.trim())
+              .language(language.trim())
+              .totalEpisode(totalEpisode.trim())
+              .duration(duration.trim())
+              .ariDate(releaseDate)
+              .build();
+      Detail<Animation> detail = new Detail<>();
+      detail.setMedia(animation);
+      Pattern pattern = Pattern.compile("SERIES_OTHER_SUBJECTS\\s*:\\s*(\\[[\\s\\S]*?]),");
+      Matcher matcher = pattern.matcher(scripts.get(0).data());
+      if (matcher.find()) {
+        String seriesArray = matcher.group(1);
+        List<Map<String, String>> series = JSON.parseObject(seriesArray, new TypeReference<List<Map<String, String>>>() {
+        });
+        List<Animation> animations = series.stream().map(item -> Animation.builder()
+                .id(item.get("id"))
+                .rating(item.get("rating"))
+                .titleCn(item.get("title"))
+                .releaseDate(item.get("year"))
+                .coverUrls(Collections.singletonList(item.get("pic")))
+                .build()).collect(Collectors.toList());
+        detail.setSeries(animations);
+      }
+      return detail;
     } catch (Exception e) {
       exceptionHandler.handle(e);
       return null;
@@ -152,55 +215,8 @@ public class Douban extends AbstractAnimationParser implements Serializable {
   public Detail<Animation> fetchDetailSync(String mediaId, ExceptionHandler exceptionHandler) {
     try {
       String fullUrl = BASE_URL + "/subject/" + mediaId + "/";
-      Element body = HttpUtil.createConnection(fullUrl, BASE_URL).get().body();
-      String title = body.select("span[property=\"v:itemreviewed\"]").text();
-      String cover = body.select("a.nbgnbg img").attr("src");
-      String genre = String.join(",", body.select("span[property=\"v:genre\"]").eachText());
-      Elements span = body.select("span.pl");
-      String releaseDate = body.select("span[property=\"v:initialReleaseDate\"]").text();
-      String country = Optional.ofNullable(span.get(4).nextSibling()).orElse(new Element("div")).toString();
-      String language = Optional.ofNullable(span.get(5).nextSibling()).orElse(new Element("div")).toString();
-      String totalEpisode = Optional.ofNullable(span.get(7).nextSibling()).orElse(new Element("div")).toString();
-      String duration = Optional.ofNullable(span.get(8).nextSibling()).orElse(new Element("div")).toString();
-      String rating = body.select("strong[property=\"v:average\"]").text();
-      String ratingCount = body.select("span[property=\"v:votes\"]").text();
-      String summary = body.select("span[property=\"v:summary\"]").html().replaceAll("<br/>", "\r\n");
-      Map<String, String> titles = StringUtil.separateTitles(title);
-      List<Element> scripts = body.getElementsByTag("script").stream().filter(script -> script.data().contains("SERIES_OTHER_SUBJECTS")).collect(Collectors.toList());
-      Animation animation = Animation.builder()
-              .subId(mediaId)
-              .coverUrls(Collections.singletonList(cover))
-              .titleCn(titles.get("titleCn"))
-              .title(titles.get("title"))
-              .genre(genre.trim())
-              .status("")
-              .rating(rating.trim())
-              .ratingCount(ratingCount.trim())
-              .description(summary)
-              .country(country.trim())
-              .language(language.trim())
-              .totalEpisode(totalEpisode.trim())
-              .duration(duration.trim())
-              .ariDate(releaseDate)
-              .build();
-      Detail<Animation> detail = new Detail<>();
-      detail.setMedia(animation);
-      Pattern pattern = Pattern.compile("SERIES_OTHER_SUBJECTS\\s*:\\s*(\\[[\\s\\S]*?]),");
-      Matcher matcher = pattern.matcher(scripts.get(0).data());
-      if (matcher.find()) {
-        String seriesArray = matcher.group(1);
-        List<Map<String, String>> series = JSON.parseObject(seriesArray, new TypeReference<List<Map<String, String>>>() {
-        });
-        List<Animation> animations = series.stream().map(item -> Animation.builder()
-                .id(item.get("id"))
-                .rating(item.get("rating"))
-                .titleCn(item.get("title"))
-                .releaseDate(item.get("year"))
-                .coverUrls(Collections.singletonList(item.get("pic")))
-                .build()).collect(Collectors.toList());
-        detail.setSeries(animations);
-      }
-      return detail;
+      String html = HttpUtil.createConnection(fullUrl, BASE_URL).get().html();
+      return fetchDetailFromHtml(html, mediaId, exceptionHandler);
     } catch (Exception e) {
       exceptionHandler.handle(e);
       return null;

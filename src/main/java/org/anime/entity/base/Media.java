@@ -58,6 +58,10 @@ public class Media implements Serializable {
    */
   private String rating;
   /**
+   * 评分详情
+   */
+  private RatingInfo ratingInfo;
+  /**
    * 评分人数
    */
   private String ratingCount;

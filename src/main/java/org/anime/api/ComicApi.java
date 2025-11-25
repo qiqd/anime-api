@@ -4,7 +4,6 @@ import org.anime.entity.meta.SourceWithDelay;
 import org.anime.loger.Logger;
 import org.anime.loger.LoggerFactory;
 import org.anime.parser.AbstractComicParser;
-import org.anime.parser.impl.animation.AAFun;
 import org.anime.parser.impl.comic.Baozi;
 import org.anime.util.HttpUtil;
 
@@ -19,7 +18,7 @@ public class ComicApi implements Serializable {
   public static final HashMap<String, AbstractComicParser> SOURCE_MAP = new HashMap<>();
 
   static {
-    SOURCE_MAP.put(AAFun.NAME, new Baozi());
+    SOURCE_MAP.put(Baozi.NAME, new Baozi());
   }
 
   public static void moveToTop(int index) {

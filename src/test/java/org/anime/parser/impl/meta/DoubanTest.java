@@ -15,7 +15,9 @@ public class DoubanTest extends TestCase {
   }
 
   public void testFetchSearchSync() throws Exception {
-    System.out.println(JSON.toJSONString(douban.fetchDetailSync("11498785", System.out::println)));
+    long start = System.currentTimeMillis();
+    System.out.println(JSON.toJSONString(douban.fetchDetailSync("3141506", System.out::println)));
+    System.out.println("耗时：" + (System.currentTimeMillis() - start) + "ms");
   }
 
   public void testFetchDetailSync() throws Exception {

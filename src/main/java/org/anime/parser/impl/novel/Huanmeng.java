@@ -17,6 +17,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * 幻梦轻小说解析器,已知有cloudflare防护
+ */
 public class Huanmeng extends AbstractNovelParser implements Serializable {
   private static final Logger log = LoggerFactory.getLogger(Huanmeng.class);
   public static final String NAME = "幻梦轻小说";
