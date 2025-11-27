@@ -3,7 +3,7 @@ package org.anime.api;
 import org.anime.entity.meta.SourceWithDelay;
 import org.anime.loger.Logger;
 import org.anime.loger.LoggerFactory;
-import org.anime.parser.AbstractComicParser;
+import org.anime.parser.HtmlParser;
 import org.anime.parser.impl.comic.Baozi;
 import org.anime.util.HttpUtil;
 
@@ -14,8 +14,8 @@ import java.util.HashMap;
 public class ComicApi implements Serializable {
   private static final Logger log = LoggerFactory.getLogger(ComicApi.class);
 
-  public static final ArrayList<SourceWithDelay<AbstractComicParser>> SOURCES_WITH_DELAY = new ArrayList<>();
-  public static final HashMap<String, AbstractComicParser> SOURCE_MAP = new HashMap<>();
+  public static final ArrayList<SourceWithDelay> SOURCES_WITH_DELAY = new ArrayList<>();
+  public static final HashMap<String, HtmlParser> SOURCE_MAP = new HashMap<>();
 
   static {
     SOURCE_MAP.put(Baozi.NAME, new Baozi());
@@ -25,7 +25,7 @@ public class ComicApi implements Serializable {
     if (index < 0 || index >= SOURCES_WITH_DELAY.size()) {
       return;
     }
-    SourceWithDelay<AbstractComicParser> sourceWithDelay = SOURCES_WITH_DELAY.remove(index);
+    SourceWithDelay sourceWithDelay = SOURCES_WITH_DELAY.remove(index);
     SOURCES_WITH_DELAY.add(0, sourceWithDelay);
   }
 

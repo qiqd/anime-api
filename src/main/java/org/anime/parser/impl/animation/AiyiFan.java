@@ -5,7 +5,7 @@ import org.anime.entity.animation.Schedule;
 import org.anime.entity.base.*;
 import org.anime.loger.Logger;
 import org.anime.loger.LoggerFactory;
-import org.anime.parser.AbstractAnimationParser;
+import org.anime.parser.HtmlParser;
 import org.anime.util.HttpUtil;
 import org.anime.util.StringUtil;
 import org.anime.util.UnicodeUtils;
@@ -21,7 +21,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-public class AiyiFan extends AbstractAnimationParser implements Serializable {
+public class AiyiFan implements HtmlParser, Serializable {
   private static final Logger log = LoggerFactory.getLogger(AiyiFan.class);
   public static final String NAME = "爱壹番";
   public static final String LOGOURL = "https://www.aiyifan.sbs/static/images/logo.jpg";
@@ -56,12 +56,12 @@ public class AiyiFan extends AbstractAnimationParser implements Serializable {
   }
 
   @Override
-  public List<Animation> fetchSearchSync(String keyword, Integer page, Integer size, ExceptionHandler exceptionHandler) {
+  public List<Media> fetchSearchSync(String keyword, Integer page, Integer size, ExceptionHandler exceptionHandler) {
     try {
       String searchUrl = "/ayf.sbssearch/-------------.html?wd=" + StringUtil.removeBlank(keyword);
       Element document = HttpUtil.createConnection(BASEURL + searchUrl).get().body();
       Elements animeItems = document.select("div.details-info-min");
-      List<Animation> animeList = new ArrayList<>();
+      List<Media> animeList = new ArrayList<>();
       for (Element it : animeItems) {
         Element imageElement = it.select("a.video-pic").get(0);
         String id = imageElement.attr("href");
@@ -102,7 +102,7 @@ public class AiyiFan extends AbstractAnimationParser implements Serializable {
 
   @Override
   @Nullable
-  public Detail<Animation> fetchDetailSync(String videoId, ExceptionHandler exceptionHandler) {
+  public Detail fetchDetailSync(String videoId, ExceptionHandler exceptionHandler) {
     try {
       Element doc = HttpUtil.createConnection(BASEURL + videoId).get().body();
       Elements playSource = doc.select("div.playlist-mobile ul.clearfix");
@@ -139,7 +139,7 @@ public class AiyiFan extends AbstractAnimationParser implements Serializable {
       animation.setLanguage(language);
       animation.setAriDate(ariDate);
       animation.setDescription(description);
-      return new Detail<>(animation, null, sources);
+      return new Detail(animation, null, sources);
     } catch (Exception e) {
       exceptionHandler.handle(e);
       return null;

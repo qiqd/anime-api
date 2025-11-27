@@ -48,11 +48,11 @@ public class HttpUtil implements Serializable {
             .header("Referer", referer);
   }
 
-  public static <T extends HtmlParser> void delayTestSync(List<SourceWithDelay<T>> delays, Map<String, T> sources) {
+  public static void delayTestSync(List<SourceWithDelay> delays, Map<String, HtmlParser> sources) {
     delays.clear();
-    for (Map.Entry<String, T> entry : sources.entrySet()) {
+    for (Map.Entry<String, HtmlParser> entry : sources.entrySet()) {
       String name = entry.getKey();
-      T parser = entry.getValue();
+      HtmlParser parser = entry.getValue();
       try {
         long startTime = System.currentTimeMillis();
         Connection connection = Jsoup.connect(parser.getBaseUrl())
@@ -65,10 +65,10 @@ public class HttpUtil implements Serializable {
         if (response.statusCode() == 200) {
           delay = (int) (endTime - startTime);
         }
-        delays.add(new SourceWithDelay<T>(delay, parser));
+        delays.add(new SourceWithDelay(delay, parser));
       } catch (Exception e) {
         log.error("Error while initializing source:{},err msg: {}", name, e.getMessage());
-        delays.add(new SourceWithDelay<T>(999999, parser));
+        delays.add(new SourceWithDelay(999999, parser));
       }
     }
     delays.sort(Comparator.comparingInt(SourceWithDelay::getDelay));

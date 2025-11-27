@@ -5,7 +5,7 @@ import org.anime.entity.base.*;
 import org.anime.entity.novel.Novel;
 import org.anime.loger.Logger;
 import org.anime.loger.LoggerFactory;
-import org.anime.parser.AbstractNovelParser;
+import org.anime.parser.HtmlParser;
 import org.anime.util.HttpUtil;
 import org.anime.util.StringUtil;
 import org.jetbrains.annotations.Nullable;
@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
 /**
  * 幻梦轻小说解析器,已知有cloudflare防护
  */
-public class Huanmeng extends AbstractNovelParser implements Serializable {
+public class Huanmeng implements HtmlParser, Serializable {
   private static final Logger log = LoggerFactory.getLogger(Huanmeng.class);
   public static final String NAME = "幻梦轻小说";
   public static final String LOGOURL = "https://www.huanmengacg.com/template/pc/czyrf01/img/logo2.png";
@@ -54,7 +54,7 @@ public class Huanmeng extends AbstractNovelParser implements Serializable {
   }
 
   @Override
-  public List<Novel> fetchSearchSync(String keyword, Integer page, Integer size, ExceptionHandler exceptionHandler) {
+  public List<Media> fetchSearchSync(String keyword, Integer page, Integer size, ExceptionHandler exceptionHandler) {
     String searchUrl = "/index.php/book/search?action=search&key=" + keyword;
     try {
       Element doc = HttpUtil.createConnection(BASEURL + searchUrl).get().body();
@@ -78,7 +78,7 @@ public class Huanmeng extends AbstractNovelParser implements Serializable {
 
   @Nullable
   @Override
-  public Detail<Novel> fetchDetailSync(String mediaId, ExceptionHandler exceptionHandler) {
+  public Detail fetchDetailSync(String mediaId, ExceptionHandler exceptionHandler) {
     try {
       Element doc = HttpUtil.createConnection(BASEURL + mediaId).get().body();
       Elements episodeNode = doc.select("div.zhangjie-quanbu.txt-xs li");
@@ -103,7 +103,7 @@ public class Huanmeng extends AbstractNovelParser implements Serializable {
       String description = infoBox.select("div.kan-jianjie").text();
       Novel novel = fillNovel(mediaId, cover, titleCN, status, genre, author, description);
       novel.setLatestChapter(lastChapter);
-      return new Detail<>(novel, null, Collections.singletonList(new Source(0, "default", episodes)));
+      return new Detail(novel, null, Collections.singletonList(new Source(0, "default", episodes)));
     } catch (Exception e) {
       exceptionHandler.handle(e);
       return null;

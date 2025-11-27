@@ -10,7 +10,7 @@ import java.io.Serializable;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class SourceWithDelay<T extends HtmlParser> implements Serializable {
+public class SourceWithDelay implements Serializable {
   private Integer delay;
-  private T htmlParser;
+  private HtmlParser htmlParser;
 }

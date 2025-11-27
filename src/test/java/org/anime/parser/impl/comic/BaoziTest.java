@@ -3,7 +3,7 @@ package org.anime.parser.impl.comic;
 import com.alibaba.fastjson.JSON;
 import junit.framework.TestCase;
 import org.anime.entity.base.Detail;
-import org.anime.entity.comic.Comic;
+import org.anime.entity.base.Media;
 
 import java.util.List;
 
@@ -11,13 +11,13 @@ public class BaoziTest extends TestCase {
   private final Baozi baozi = new Baozi();
 
   public void testFetchSearchSync() throws Exception {
-    List<Comic> comics = baozi.fetchSearchSync("租借女友", 1, 10, System.out::println);
+    List<Media> comics = baozi.fetchSearchSync("租借女友", 1, 10, System.out::println);
     System.out.println(JSON.toJSONString(comics));
     System.out.println(comics.size());
   }
 
   public void testFetchDetailSync() throws Exception {
-    Detail<Comic> comicDetail = baozi.fetchDetailSync("/comic/zujienuyou-gongdaolili", System.out::println);
+    Detail comicDetail = baozi.fetchDetailSync("/comic/zujienuyou-gongdaolili", System.out::println);
     System.out.println(JSON.toJSONString(comicDetail));
   }
 

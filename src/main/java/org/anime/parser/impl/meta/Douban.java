@@ -8,7 +8,7 @@ import org.anime.entity.animation.Staff;
 import org.anime.entity.base.*;
 import org.anime.entity.enumeration.StaffType;
 import org.anime.entity.meta.Item;
-import org.anime.parser.AbstractAnimationParser;
+import org.anime.parser.HtmlParser;
 import org.anime.util.HttpUtil;
 import org.anime.util.StringUtil;
 import org.jetbrains.annotations.Nullable;
@@ -24,7 +24,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-public class Douban extends AbstractAnimationParser implements Serializable {
+public class Douban implements HtmlParser, Serializable {
   private static final String NAME = "豆瓣";
   private static final String BASE_URL = "https://movie.douban.com";
   private static final String LOGO_URL = "https://movie.douban.com";
@@ -87,7 +87,7 @@ public class Douban extends AbstractAnimationParser implements Serializable {
   }
 
   @Nullable
-  public Detail<Animation> fetchDetailFromHtml(String html, String mediaId, ExceptionHandler exceptionHandler) {
+  public Detail fetchDetailFromHtml(String html, String mediaId, ExceptionHandler exceptionHandler) {
     try {
       Element body = Jsoup.parse(html).body();
       String title = body.select("span[property=\"v:itemreviewed\"]").text();
@@ -128,7 +128,7 @@ public class Douban extends AbstractAnimationParser implements Serializable {
               .duration(duration.trim())
               .ariDate(releaseDate)
               .build();
-      Detail<Animation> detail = new Detail<>();
+      Detail detail = new Detail();
       detail.setMedia(animation);
       Pattern pattern = Pattern.compile("SERIES_OTHER_SUBJECTS\\s*:\\s*(\\[[\\s\\S]*?]),");
       Matcher matcher = pattern.matcher(scripts.get(0).data());
@@ -136,7 +136,7 @@ public class Douban extends AbstractAnimationParser implements Serializable {
         String seriesArray = matcher.group(1);
         List<Map<String, String>> series = JSON.parseObject(seriesArray, new TypeReference<List<Map<String, String>>>() {
         });
-        List<Animation> animations = series.stream().map(item -> Animation.builder()
+        List<Media> animations = series.stream().map(item -> Animation.builder()
                 .id(item.get("id"))
                 .rating(item.get("rating"))
                 .titleCn(item.get("title"))
@@ -177,7 +177,7 @@ public class Douban extends AbstractAnimationParser implements Serializable {
   }
 
   @Override
-  public List<Animation> fetchSearchSync(String keyword, Integer page, Integer size, ExceptionHandler exceptionHandler) {
+  public List<Media> fetchSearchSync(String keyword, Integer page, Integer size, ExceptionHandler exceptionHandler) {
     try {
       //https://search.douban.com/movie/subject_search?search_text=%E3%80%90%E6%88%91%E6%8E%A8%E7%9A%84%E5%AD%A9%E5%AD%90%E3%80%91
       String fullUrl = "https://search.douban.com/movie/subject_search?search_text=" + keyword;
@@ -212,7 +212,7 @@ public class Douban extends AbstractAnimationParser implements Serializable {
 
   @Nullable
   @Override
-  public Detail<Animation> fetchDetailSync(String mediaId, ExceptionHandler exceptionHandler) {
+  public Detail fetchDetailSync(String mediaId, ExceptionHandler exceptionHandler) {
     try {
       String fullUrl = BASE_URL + "/subject/" + mediaId + "/";
       String html = HttpUtil.createConnection(fullUrl, BASE_URL).get().html();

@@ -3,7 +3,7 @@ package org.anime.api;
 import org.anime.entity.meta.SourceWithDelay;
 import org.anime.loger.Logger;
 import org.anime.loger.LoggerFactory;
-import org.anime.parser.AbstractAnimationParser;
+import org.anime.parser.HtmlParser;
 import org.anime.parser.impl.animation.*;
 import org.anime.util.HttpUtil;
 
@@ -16,8 +16,8 @@ import java.util.Map;
 public class AnimationApi implements Serializable {
   private static final Logger log = LoggerFactory.getLogger(AnimationApi.class);
 
-  public static final List<SourceWithDelay<AbstractAnimationParser>> SOURCES_WITH_DELAY = new ArrayList<>();
-  public static final Map<String, AbstractAnimationParser> SOURCE_MAP = new HashMap<>();
+  public static final List<SourceWithDelay> SOURCES_WITH_DELAY = new ArrayList<>();
+  public static final Map<String, HtmlParser> SOURCE_MAP = new HashMap<>();
 
   static {
     SOURCE_MAP.put(AAFun.NAME, new AAFun());
@@ -32,7 +32,7 @@ public class AnimationApi implements Serializable {
     if (index < 0 || index >= SOURCES_WITH_DELAY.size()) {
       return;
     }
-    SourceWithDelay<AbstractAnimationParser> sourceWithDelay = SOURCES_WITH_DELAY.remove(index);
+    SourceWithDelay sourceWithDelay = SOURCES_WITH_DELAY.remove(index);
     SOURCES_WITH_DELAY.add(0, sourceWithDelay);
   }
 

@@ -2,7 +2,7 @@ package org.anime.parser.impl.meta;
 
 import com.alibaba.fastjson.JSON;
 import junit.framework.TestCase;
-import org.anime.entity.animation.Animation;
+import org.anime.entity.base.Media;
 
 import java.util.List;
 
@@ -10,7 +10,7 @@ public class DoubanTest extends TestCase {
   private final Douban douban = new Douban();
 
   public void testFetchStaffSync() throws Exception {
-    List<Animation> animations = douban.fetchSearchSync("JOJO的奇妙冒险", 1, 1, System.out::println);
+    List<Media> animations = douban.fetchSearchSync("JOJO的奇妙冒险", 1, 1, System.out::println);
     System.out.println(JSON.toJSONString(animations));
   }
 

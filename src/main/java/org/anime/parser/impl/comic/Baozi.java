@@ -5,7 +5,7 @@ import org.anime.entity.base.*;
 import org.anime.entity.comic.Comic;
 import org.anime.loger.Logger;
 import org.anime.loger.LoggerFactory;
-import org.anime.parser.AbstractComicParser;
+import org.anime.parser.HtmlParser;
 import org.anime.util.HttpUtil;
 import org.jetbrains.annotations.Nullable;
 import org.jsoup.nodes.Element;
@@ -16,7 +16,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class Baozi extends AbstractComicParser implements Serializable {
+public class Baozi implements HtmlParser, Serializable {
   private static final Logger log = LoggerFactory.getLogger(Baozi.class);
   public static final String NAME = "包子漫画";
   public static final String LOGOURL = "https://static-tw.baozimhcn.com/static/bzmh/img/favicon-96x96.png";
@@ -38,7 +38,7 @@ public class Baozi extends AbstractComicParser implements Serializable {
   }
 
   @Override
-  public List<Comic> fetchSearchSync(String keyword, Integer page, Integer size, ExceptionHandler exceptionHandler) {
+  public List<Media> fetchSearchSync(String keyword, Integer page, Integer size, ExceptionHandler exceptionHandler) {
     try {
       //https://cn.baozimhcn.com/search?q=%E7%A7%9F%E5%80%9F%E5%A5%B3%E5%8F%8B
       Element doc = HttpUtil.createConnection(BASEURL + "/search?q=" + keyword).get().body();
@@ -66,7 +66,7 @@ public class Baozi extends AbstractComicParser implements Serializable {
 
   @Nullable
   @Override
-  public Detail<Comic> fetchDetailSync(String comicId, ExceptionHandler exceptionHandler) {
+  public Detail fetchDetailSync(String comicId, ExceptionHandler exceptionHandler) {
     try {
       Element doc = HttpUtil.createConnection(BASEURL + comicId).get().body();
       Elements chapter1 = doc.select("div#chapter-items");
@@ -101,7 +101,7 @@ public class Baozi extends AbstractComicParser implements Serializable {
       comic.setGenre(genre);
       comic.setStatus(status);
       comic.setCoverUrls(Collections.singletonList(cover));
-      return new Detail<>(comic, null, Collections.singletonList(new Source(0, "默认", result1)));
+      return new Detail(comic, null, Collections.singletonList(new Source(0, "默认", result1)));
     } catch (Exception e) {
       exceptionHandler.handle(e);
       return null;

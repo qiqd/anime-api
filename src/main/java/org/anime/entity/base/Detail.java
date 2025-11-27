@@ -12,8 +12,8 @@ import java.util.List;
 @SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
-public class Detail<T extends Media> implements Serializable {
-  private T media;
-  private List<T> series;
+public class Detail implements Serializable {
+  private Media media;
+  private List<Media> series;
   private List<Source> sources;
 }

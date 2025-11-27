@@ -7,7 +7,7 @@ import org.anime.entity.animation.Schedule;
 import org.anime.entity.base.*;
 import org.anime.loger.Logger;
 import org.anime.loger.LoggerFactory;
-import org.anime.parser.AbstractAnimationParser;
+import org.anime.parser.HtmlParser;
 import org.anime.util.HttpUtil;
 import org.anime.util.StringUtil;
 import org.jetbrains.annotations.Nullable;
@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 
-public class GirigiriLove extends AbstractAnimationParser implements Serializable {
+public class GirigiriLove implements HtmlParser, Serializable {
   private static final Logger log = LoggerFactory.getLogger(GirigiriLove.class);
 
   public static final String NAME = "Girigiri爱动漫";
@@ -48,11 +48,11 @@ public class GirigiriLove extends AbstractAnimationParser implements Serializabl
   }
 
   @Override
-  public List<Animation> fetchSearchSync(String keyword, Integer page, Integer size, ExceptionHandler exceptionHandler) {
+  public List<Media> fetchSearchSync(String keyword, Integer page, Integer size, ExceptionHandler exceptionHandler) {
     try {
       String searchUrl = "/search/-------------/?wd=" + StringUtil.removeBlank(keyword);
       Element body = HttpUtil.createConnection(BASEURL + searchUrl).get().body();
-      ArrayList<Animation> animations = new ArrayList<>();
+      List<Media> animations = new ArrayList<>();
       Elements elements = body.select("div.search-list");
       for (Element element : elements) {
         String href = element.select("div.detail-info a").attr("href");
@@ -84,7 +84,7 @@ public class GirigiriLove extends AbstractAnimationParser implements Serializabl
 
   @Override
   @Nullable
-  public Detail<Animation> fetchDetailSync(String videoId, ExceptionHandler exceptionHandler) {
+  public Detail fetchDetailSync(String videoId, ExceptionHandler exceptionHandler) {
     try {
       Element body = HttpUtil.createConnection(BASEURL + videoId).get().body();
       Elements detailDiv = body.select("div.vod-detail.style-detail");
@@ -127,7 +127,7 @@ public class GirigiriLove extends AbstractAnimationParser implements Serializabl
       anime.setGenre(StringUtil.removeUnusedChar(type));
       anime.setStatus(status);
       anime.setDescription(description);
-      return new Detail<>(anime, null, sources);
+      return new Detail(anime, null, sources);
     } catch (Exception e) {
       exceptionHandler.handle(e);
       return null;

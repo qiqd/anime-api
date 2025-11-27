@@ -5,7 +5,7 @@ import org.anime.entity.animation.Schedule;
 import org.anime.entity.base.*;
 import org.anime.loger.Logger;
 import org.anime.loger.LoggerFactory;
-import org.anime.parser.AbstractAnimationParser;
+import org.anime.parser.HtmlParser;
 import org.anime.util.HttpUtil;
 import org.anime.util.StringUtil;
 import org.jetbrains.annotations.Nullable;
@@ -23,7 +23,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 
-public class MengDao extends AbstractAnimationParser implements Serializable {
+public class MengDao implements HtmlParser, Serializable {
   private static final Logger log = LoggerFactory.getLogger(MengDao.class);
 
   public static final String NAME = "萌岛动漫";
@@ -49,7 +49,7 @@ public class MengDao extends AbstractAnimationParser implements Serializable {
   }
 
   @Override
-  public List<Animation> fetchSearchSync(String keyword, Integer page, Integer size, ExceptionHandler exceptionHandler) {
+  public List<Media> fetchSearchSync(String keyword, Integer page, Integer size, ExceptionHandler exceptionHandler) {
 //    https://www.mengdao.tv/search.php?searchword=未来日记
     try {
       String searchUrl = BASEURL + "/search.php?searchword=" + StringUtil.removeBlank(keyword);
@@ -77,7 +77,7 @@ public class MengDao extends AbstractAnimationParser implements Serializable {
 
   @Override
   @Nullable
-  public Detail<Animation> fetchDetailSync(String videoId, ExceptionHandler exceptionHandler) {
+  public Detail fetchDetailSync(String videoId, ExceptionHandler exceptionHandler) {
     try {
       Element doc = HttpUtil.createConnection(BASEURL + videoId).get().body();
       Elements episodeBox = doc.select("div.plist.clearfix");
@@ -122,7 +122,7 @@ public class MengDao extends AbstractAnimationParser implements Serializable {
       animation.setActor(StringUtil.removeUnusedChar(cast).substring(3));
       animation.setRole(StringUtil.removeUnusedChar(role).substring(3));
       animation.setTitleEn(otherName.substring(3).trim());
-      return new Detail<>(animation, null, sources);
+      return new Detail(animation, null, sources);
     } catch (Exception e) {
       exceptionHandler.handle(e);
       return null;

@@ -7,7 +7,7 @@ import org.anime.entity.animation.Schedule;
 import org.anime.entity.base.*;
 import org.anime.loger.Logger;
 import org.anime.loger.LoggerFactory;
-import org.anime.parser.AbstractAnimationParser;
+import org.anime.parser.HtmlParser;
 import org.anime.util.HttpUtil;
 import org.anime.util.StringUtil;
 import org.jetbrains.annotations.Nullable;
@@ -25,7 +25,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 
-public class SenFun extends AbstractAnimationParser implements Serializable {
+public class SenFun implements HtmlParser, Serializable {
   private static final Logger log = LoggerFactory.getLogger(SenFun.class);
 
   public static final String NAME = "森之屋";
@@ -60,7 +60,7 @@ public class SenFun extends AbstractAnimationParser implements Serializable {
   }
 
   @Override
-  public List<Animation> fetchSearchSync(String keyword, Integer page, Integer size, ExceptionHandler exceptionHandler) {
+  public List<Media> fetchSearchSync(String keyword, Integer page, Integer size, ExceptionHandler exceptionHandler) {
     try {
       //https://senfun.in/search.html?wd=JOJO
       Element doc = HttpUtil.createConnection(BASE_URL + "search.html?wd=" + StringUtil.removeBlank(keyword)).get().body();
@@ -91,7 +91,7 @@ public class SenFun extends AbstractAnimationParser implements Serializable {
 
   @Override
   @Nullable
-  public Detail<Animation> fetchDetailSync(String videoId, ExceptionHandler exceptionHandler) {
+  public Detail fetchDetailSync(String videoId, ExceptionHandler exceptionHandler) {
     try {
       Element doc = HttpUtil.createConnection(BASE_URL + videoId).get().body();
       //获取播放源
@@ -126,7 +126,7 @@ public class SenFun extends AbstractAnimationParser implements Serializable {
       animation.setAriDate(airDate);
       animation.setDuration(duration);
       animation.setTotalEpisode(totalEpisode);
-      return new Detail<>(animation, null, sources);
+      return new Detail(animation, null, sources);
     } catch (Exception e) {
       exceptionHandler.handle(e);
       return null;

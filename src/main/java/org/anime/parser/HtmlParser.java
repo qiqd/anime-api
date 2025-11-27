@@ -39,7 +39,7 @@ public interface HtmlParser extends Serializable {
    * @return List<Anime>
    */
 
-  List<? extends Media> fetchSearchSync(String keyword, Integer page, Integer size, ExceptionHandler exceptionHandler);
+  List<Media> fetchSearchSync(String keyword, Integer page, Integer size, ExceptionHandler exceptionHandler);
 
   /**
    * 解析详情信息
@@ -48,7 +48,7 @@ public interface HtmlParser extends Serializable {
    * @param exceptionHandler 异常处理器
    * @return AnimeDetail
    */
-  Detail<? extends Media> fetchDetailSync(String mediaId, ExceptionHandler exceptionHandler);
+  Detail fetchDetailSync(String mediaId, ExceptionHandler exceptionHandler);
 
   /**
    * 解析播放信息

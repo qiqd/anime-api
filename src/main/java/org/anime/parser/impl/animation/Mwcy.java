@@ -2,13 +2,10 @@ package org.anime.parser.impl.animation;
 
 import org.anime.entity.animation.Animation;
 import org.anime.entity.animation.Schedule;
-import org.anime.entity.base.Detail;
-import org.anime.entity.base.ExceptionHandler;
-import org.anime.entity.base.Source;
-import org.anime.entity.base.ViewInfo;
+import org.anime.entity.base.*;
 import org.anime.loger.Logger;
 import org.anime.loger.LoggerFactory;
-import org.anime.parser.AbstractAnimationParser;
+import org.anime.parser.HtmlParser;
 import org.anime.util.HttpUtil;
 import org.anime.util.StringUtil;
 import org.jetbrains.annotations.Nullable;
@@ -28,7 +25,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-public class Mwcy extends AbstractAnimationParser implements Serializable {
+public class Mwcy implements HtmlParser, Serializable {
   private static final Logger log = LoggerFactory.getLogger(Mwcy.class);
 
   public static final String NAME = "喵物次元";
@@ -47,7 +44,7 @@ public class Mwcy extends AbstractAnimationParser implements Serializable {
     return animation;
   }
 
-  private Animation apply(Element item) {
+  private Media apply(Element item) {
     Elements coverImg = item.select("div.detail-pic img");
     String titleCn = coverImg.attr("alt");
     String covet = coverImg.attr("data-src");
@@ -59,7 +56,7 @@ public class Mwcy extends AbstractAnimationParser implements Serializable {
     String actor = infoItem.size() > 2 ? infoItem.get(2).text().substring(4) : "";
     String genre = infoItem.size() > 3 ? infoItem.get(3).text().substring(4) : "";
 
-    Animation animation = fillAnimation(titleCn, covet, id, director, actor, genre);
+    Media animation = fillAnimation(titleCn, covet, id, director, actor, genre);
     animation.setStatus(status);
     return animation;
   }
@@ -95,7 +92,7 @@ public class Mwcy extends AbstractAnimationParser implements Serializable {
   }
 
   @Override
-  public List<Animation> fetchSearchSync(String keyword, Integer page, Integer size, ExceptionHandler exceptionHandler) {
+  public List<Media> fetchSearchSync(String keyword, Integer page, Integer size, ExceptionHandler exceptionHandler) {
     //https://www.mwcy.net/search/wd/JOJO.html
     String searchUrl = "/search/wd/" + StringUtil.removeBlank(keyword) + ".html";
     try {
@@ -110,7 +107,7 @@ public class Mwcy extends AbstractAnimationParser implements Serializable {
 
   @Override
   @Nullable
-  public Detail<Animation> fetchDetailSync(String videoId, ExceptionHandler exceptionHandler) {
+  public Detail fetchDetailSync(String videoId, ExceptionHandler exceptionHandler) {
     try {
       Element doc = HttpUtil.createConnection(BASE_URL + videoId).get().body();
       Elements elements = doc.select("div.anthology-list-box.none");
@@ -119,7 +116,7 @@ public class Mwcy extends AbstractAnimationParser implements Serializable {
         return null;
       }
       List<Source> sources = elements.stream().map(SenFun::parseSource).collect(Collectors.toList());
-      Animation animation = this.apply(doc);
+      Media animation = this.apply(doc);
       String rating = doc.select("div.fraction").text();
       String totalRating = doc.select("span.text-site.cor2").text();
       String introduction = doc.select("div#height_limit").text();
@@ -127,7 +124,7 @@ public class Mwcy extends AbstractAnimationParser implements Serializable {
       animation.setRating(rating);
       animation.setRatingCount(totalRating);
       animation.setDescription(introduction);
-      return new Detail<>(animation, null, sources);
+      return new Detail(animation, null, sources);
     } catch (Exception e) {
       exceptionHandler.handle(e);
       return null;
