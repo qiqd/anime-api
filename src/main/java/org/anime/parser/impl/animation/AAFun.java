@@ -99,11 +99,18 @@ public class AAFun implements HtmlParser, Serializable {
       }
 
 // 解析标题
-      Elements titleElements = document.select(".hl-dc-NAME");
+      Elements titleElements = document.select("span.hl-crumb-item");
       if (!titleElements.isEmpty()) {
         animation.setTitleCn(titleElements.get(0).text());
       }
-
+      Elements subTitleElements = document.select("div.hl-dc-sub");
+      if (!subTitleElements.isEmpty()) {
+        animation.setTitle(subTitleElements.get(0).text());
+      }
+      Elements ratingCount = document.select("span.hl-score-data.hl-text-muted.hl-pull-right");
+      if (!ratingCount.isEmpty()) {
+        animation.setRatingCount(ratingCount.get(0).text());
+      }
 // 解析状态
       Elements statusElements = document.select(".hl-vod-data .hl-col-xs-12 span.hl-text-conch");
       if (!statusElements.isEmpty()) {
@@ -127,29 +134,33 @@ public class AAFun implements HtmlParser, Serializable {
       }
 
 // 解析年份
-      Elements yearElements = document.select(".hl-vod-data .hl-col-xs-12.hl-col-sm-4");
-      if (!yearElements.isEmpty()) {
-        Element yearElement = yearElements.get(0);
+      Elements infoBox = document.select(".hl-vod-data .hl-col-xs-12.hl-col-sm-4");
+      if (!infoBox.isEmpty()) {
+        Element yearElement = infoBox.get(0);
         String yearText = yearElement.text();
         String year = yearText.replaceAll("\\D+", "");
         animation.setAriDate(year);
       }
 
 // 解析类型
-      Elements typeElements = document.select(".hl-vod-data .hl-col-xs-12.hl-col-sm-4");
-      if (typeElements.size() > 2) {
-        Element typeElement = typeElements.get(2);
+      if (infoBox.size() > 2) {
+        Element typeElement = infoBox.get(2);
         Elements typeLinks = typeElement.select("a");
         String genres = typeLinks.text();
         animation.setGenre(StringUtil.removeUnusedChar(genres));
       }
 
 // 解析上映时间
-      Elements releaseElements = document.select(".hl-vod-data .hl-col-xs-12.hl-col-sm-4");
-      if (releaseElements.size() > 4) {
-        Element releaseElement = releaseElements.get(4);
+      if (infoBox.size() > 4) {
+        Element releaseElement = infoBox.get(4);
         String releaseText = releaseElement.text();
         animation.setAriDate(releaseText);
+      }
+// 解析上映时间
+      if (infoBox.size() > 5) {
+        Element releaseElement = infoBox.get(5);
+        String language = releaseElement.text();
+        animation.setLanguage(language);
       }
 
 // 解析简介

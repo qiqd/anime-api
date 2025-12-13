@@ -88,14 +88,14 @@ public class Baozi implements HtmlParser, Serializable {
       result1.addAll(result2);
       Elements infoBox = doc.select("div.pure-g.de-info__box");
       String cover = infoBox.select("div.pure-u-1-1.pure-u-sm-1-3.pure-u-md-1-6 > amp-img").attr("src");
-      String title = infoBox.select("h2.comics-detail__title").text();
+      String title = infoBox.select("h1.comics-detail__title").text();
       String author = infoBox.select("h2.comics-detail__author").text();
       String description = infoBox.select("p.comics-detail__desc").text();
       String genre = infoBox.select("div.tag-list").text();
       String status = infoBox.select("div.supporting-text.mt-2 > div:last-child").text();
       Comic comic = new Comic();
       comic.setId(comicId);
-      comic.setTitle(title);
+      comic.setTitleCn(title);
       comic.setAuthor(author);
       comic.setDescription(description);
       comic.setGenre(genre);
@@ -114,12 +114,13 @@ public class Baozi implements HtmlParser, Serializable {
     try {
       Element doc = HttpUtil.createConnection(BASEURL + chapterId).get().body();
       Elements comicPages = doc.select("ul.comic-contain div");
+      String title = doc.select("div.header span.title").text();
       List<String> urls = comicPages.stream().skip(1).filter(item -> item.html().contains("amp-img")).map(page -> {
         Elements image = page.select("noscript img");
         //      title = image.attr("alt");
         return image.attr("src");
       }).collect(Collectors.toList());
-      return new ViewInfo(null, chapterId, urls);
+      return new ViewInfo(title, chapterId, urls);
     } catch (Exception e) {
       exceptionHandler.handle(e);
       return null;
