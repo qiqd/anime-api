@@ -150,6 +150,7 @@ public class SenFun implements HtmlParser, Serializable {
         log.error("未找到播放url, episodeId: {}", episodeId);
         return null;
       }
+      String data = script.get(0).data();
       String tempUrl = matcher.group(1);
       Connection connect = Jsoup.connect(BASE_URL + tempUrl);
       String body = connect.execute().body();

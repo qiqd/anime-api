@@ -173,9 +173,18 @@ public class MengDao implements HtmlParser, Serializable {
       byte[] validData = new byte[endIndex];
       System.arraycopy(decryptedBytes, 0, validData, 0, endIndex);
       String result = new String(validData, StandardCharsets.UTF_8);
-      VideoData videoData = parseVideoData(result);
-      String currentVideoUrl = getCurrentVideoUrl(videoData, BASEURL + episodeId);
-      return new ViewInfo(null, episodeId, Collections.singletonList(currentVideoUrl));
+      String[] episodesString = result.split("#");
+      List<String> eps = Arrays.stream(episodesString).map(s -> s.substring(s.indexOf("$") + 1, s.lastIndexOf("$"))).map(s -> s.replaceAll("\\$.+?\\$", "")).collect(Collectors.toList());
+      String episodeIndex = episodeId.substring(episodeId.lastIndexOf("-") + 1, episodeId.lastIndexOf("."));
+      String target = eps.get(Integer.parseInt(episodeIndex)).replaceAll("http://", "https://");
+//      System.out.println("size:" + eps.size());
+//      System.out.println(eps);
+//      if (true) {
+//        return null;
+//      }
+//      VideoData videoData = parseVideoData(result);
+//      String currentVideoUrl = getCurrentVideoUrl(videoData, BASEURL + episodeId);
+      return new ViewInfo(null, episodeId, Collections.singletonList(target));
     } catch (Exception e) {
       exceptionHandler.handle(e);
       return null;

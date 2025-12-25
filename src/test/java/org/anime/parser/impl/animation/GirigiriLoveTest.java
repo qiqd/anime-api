@@ -12,12 +12,12 @@ public class GirigiriLoveTest extends TestCase {
   private final GirigiriLove girigiriLove = new GirigiriLove();
 
   public void testFetchSearchSync() throws Exception {
-    List<Media> animations = girigiriLove.fetchSearchSync("JOJO的奇妙冒险", 10, 1, System.out::println);
+    List<Media> animations = girigiriLove.fetchSearchSync("租借女友 第三季", 10, 1, System.out::println);
     System.out.println(JSON.toJSONString(animations));
-    Detail animationDetail = girigiriLove.fetchDetailSync("/GV765/", System.out::println);
-    System.out.println(JSON.toJSONString(animationDetail));
-    ViewInfo playInfo = girigiriLove.fetchViewSync("/playGV765-1-1/", System.out::println);
-    System.out.println(JSON.toJSONString(playInfo));
+//    Detail animationDetail = girigiriLove.fetchDetailSync("/GV765/", System.out::println);
+//    System.out.println(JSON.toJSONString(animationDetail));
+//    ViewInfo playInfo = girigiriLove.fetchViewSync("/playGV765-1-1/", System.out::println);
+//    System.out.println(JSON.toJSONString(playInfo));
   }
 
   /**

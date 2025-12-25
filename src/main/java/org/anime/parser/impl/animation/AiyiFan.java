@@ -21,6 +21,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+@Deprecated
 public class AiyiFan implements HtmlParser, Serializable {
   private static final Logger log = LoggerFactory.getLogger(AiyiFan.class);
   public static final String NAME = "爱壹番";

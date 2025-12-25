@@ -9,28 +9,28 @@ import org.junit.Test;
 import java.util.List;
 
 public class AAFunTest {
-    private final AAFun aaFun = new AAFun();
+  private final AAFun aaFun = new AAFun();
 
-    /**
-     * [{"coverUrls":["https://img.pan.kg/images/503450_wS9yJ.webp"],"id":"/feng-n/ymCCCS.html","status":"已完结","titleCn":"租借女友 第四季"},{"coverUrls":["https://img.pan.kg/images/296076_6cP6Q.webp"],"id":"/feng-n/1vCCCS.html","status":"已完结","titleCn":"租借女友"},{"coverUrls":["https://img.pan.kg/images/401783_x6496.webp"],"id":"/feng-n/svCCCS.html","status":"已完结","titleCn":"租借女友 第三季"},{"coverUrls":["https://img.pan.kg/images/315745_n981m.webp"],"id":"/feng-n/USCCCS.html","status":"已完结","titleCn":"租借女友 第二季"}]
-     *
-     * @throws Exception
-     */
-    @Test
-    public void fetchSearchSync() throws Exception {
-        List<Media> result = aaFun.fetchSearchSync("JOJO的奇妙冒险", 1, 10, System.out::println);
-        System.out.println(JSON.toJSONString(result));
-    }
+  /**
+   * [{"coverUrls":["https://img.pan.kg/images/503450_wS9yJ.webp"],"id":"/feng-n/ymCCCS.html","status":"已完结","titleCn":"租借女友 第四季"},{"coverUrls":["https://img.pan.kg/images/296076_6cP6Q.webp"],"id":"/feng-n/1vCCCS.html","status":"已完结","titleCn":"租借女友"},{"coverUrls":["https://img.pan.kg/images/401783_x6496.webp"],"id":"/feng-n/svCCCS.html","status":"已完结","titleCn":"租借女友 第三季"},{"coverUrls":["https://img.pan.kg/images/315745_n981m.webp"],"id":"/feng-n/USCCCS.html","status":"已完结","titleCn":"租借女友 第二季"}]
+   *
+   * @throws Exception
+   */
+  @Test
+  public void fetchSearchSync() throws Exception {
+    List<Media> result = aaFun.fetchSearchSync("我推的孩子", 1, 10, System.out::println);
+    System.out.println(JSON.toJSONString(result));
+  }
 
-    @Test
-    public void fetchDetailSync() throws Exception {
-        Detail animationDetail = aaFun.fetchDetailSync("/feng-n/7RCCCS.html", System.out::println);
-        System.out.printf(JSON.toJSONString(animationDetail));
-    }
+  @Test
+  public void fetchDetailSync() throws Exception {
+    Detail animationDetail = aaFun.fetchDetailSync("/feng-n/aKCCCS.html", System.out::println);
+    System.out.printf(JSON.toJSONString(animationDetail));
+  }
 
-    @Test
-    public void fetchViewSync() throws Exception {
-        ViewInfo playInfo = aaFun.fetchViewSync("/f/hxCCCS-1-1.html", System.out::println);
-        System.out.println(JSON.toJSONString(playInfo));
-    }
+  @Test
+  public void fetchViewSync() throws Exception {
+    ViewInfo playInfo = aaFun.fetchViewSync("/f/aKCCCS-2-13.html", System.out::println);
+    System.out.println(JSON.toJSONString(playInfo));
+  }
 }

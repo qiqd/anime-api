@@ -197,7 +197,7 @@ public class AAFun implements HtmlParser, Serializable {
       String objectString = varPlayerAaaa.data().substring(varPlayerAaaa.data().indexOf("{"));
       PlayerData playerData = JSON.parseObject(objectString, PlayerData.class);
       String decodeUrl = URLDecoder.decode(playerData.getUrl(), StandardCharsets.UTF_8.name());
-      String fullFullUrl = BASEURL + "/player/?url=" + decodeUrl;
+      String fullFullUrl = BASEURL + "/player/?url=" + playerData.getUrl();
       HashMap<String, String> headers = new HashMap<>();
       headers.put("Host", BASEURL.substring(BASEURL.lastIndexOf("/") + 1));
       headers.put("Referer", BASEURL + episodeId);
@@ -251,19 +251,30 @@ public class AAFun implements HtmlParser, Serializable {
 
   private String decryptAES(String ciphertext, String key) {
     try {
+      // 将密文进行Base64解码，得到原始字节数组
       byte[] rawBytes = Base64.getDecoder().decode(ciphertext);
+      // 从原始字节数组中提取前16个字节作为IV（初始化向量）
       byte[] ivBytes = Arrays.copyOfRange(rawBytes, 0, 16);
+      // 从原始字节数组中提取第16个字节之后的部分作为加密数据
       byte[] encryptedBytes = Arrays.copyOfRange(rawBytes, 16, rawBytes.length);
 
+      // 创建AES/CBC/PKCS5Padding模式的密码器实例
       Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+      // 使用提供的密钥创建AES密钥规范
       SecretKeySpec keySpec = new SecretKeySpec(key.getBytes(StandardCharsets.UTF_8), "AES");
+      // 使用提取的IV创建IV参数规范
       IvParameterSpec ivSpec = new IvParameterSpec(ivBytes);
+      // 初始化密码器为解密模式，设置密钥和IV
       cipher.init(Cipher.DECRYPT_MODE, keySpec, ivSpec);
 
+      // 执行解密操作，得到明文字节数组
       byte[] plainText = cipher.doFinal(encryptedBytes);
+      // 将明文字节数组转换为UTF-8编码的字符串并返回
       return new String(plainText, StandardCharsets.UTF_8);
     } catch (Exception e) {
+      // 解密失败时打印错误信息
       System.out.println("URL解密失败: " + e.getMessage());
+      // 抛出运行时异常
       throw new RuntimeException(e);
     }
   }
